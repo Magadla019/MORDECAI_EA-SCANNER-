@@ -156,7 +156,6 @@ function setRunning(running) {
 }
 
 document.getElementById('btn-start').addEventListener('click', async () => {
-  if (!state.token) return showView('login');
   runState.textContent = 'SYNCING…';
   try { await refreshMt5Status(); } catch {}
   setRunning(true);
@@ -409,14 +408,14 @@ function renderResult(r) {
 }
 
 // ---------------- boot ----------------
+// Registration/login is temporarily bypassed - the app opens straight to the
+// dashboard. Re-enable by restoring the token check below once auth is wired
+// back in. Backend calls that need a token (MT5 status, performance, signals)
+// already fail gracefully and just show offline/empty states without one.
 renderEngines(false);
-if (state.token) {
-  showView('dashboard');
-  startPolling();
-  setRunning(state.running);
-} else {
-  showView('login');
-}
+showView('dashboard');
+startPolling();
+setRunning(state.running);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js').catch(() => {});
