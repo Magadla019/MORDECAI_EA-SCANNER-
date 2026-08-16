@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en" data-theme="red">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070a">
+<title>MORDECAI_EA SCANNER</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= LOGIN VIEW ================= -->
+  <section id="view-login" class="view active">
+    <div class="hero">
+      <div class="ring"><img src="icons/icon-512.png" alt="MORDECAI"></div>
+      <h1 class="brand-title" style="font-size:22px;font-weight:700;letter-spacing:1px;">MORDECAI<span style="color:var(--accent)">_EA</span> SCANNER</h1>
+      <div class="sub" style="letter-spacing:3px;font-size:11px;color:var(--text-dim);margin-top:4px;">SMART MONEY CONCEPTS</div>
+      <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
+    </div>
+    <div class="card">
+      <h3 id="auth-mode-label">Sign In</h3>
+      <div class="field"><label>Email</label><input id="auth-email" type="email" autocomplete="username"></div>
+      <div class="field"><label>Password</label><input id="auth-password" type="password" autocomplete="current-password"></div>
+      <button id="auth-submit" class="btn btn-start btn-block">SIGN IN</button>
+      <button id="auth-toggle" class="btn-secondary btn-block" style="margin-top:10px;">Need an account? Register</button>
+      <p id="auth-error" class="footer-note" style="color:#ef4444;"></p>
+    </div>
+    <p class="footer-note">Set your backend URL once in Settings after signing in.<br>This tool never places, closes, or modifies trades automatically.</p>
+  </section>
+
+  <!-- ================= DASHBOARD VIEW ================= -->
+  <section id="view-dashboard" class="view">
+    <div class="topbar">
+      <button class="menu-btn" id="open-menu">☰</button>
+      <div class="brand"><h1>MORDECAI<span>_EA</span></h1><div class="sub">SMART MONEY CONCEPTS</div></div>
+      <div class="status-dot"><span class="dot off" id="conn-dot"></span></div>
+    </div>
+
+    <div class="hero" style="padding-top:0;">
+      <div class="ring" style="width:110px;height:110px;"><img src="icons/icon-512.png" alt="MORDECAI"></div>
+      <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
+      <div class="run-state stopped" id="run-state">NOT RUNNING</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-start" id="btn-start">START</button>
+      <button class="btn btn-stop" id="btn-stop">STOP</button>
+    </div>
+
+    <div class="card">
+      <h3>System Status</h3>
+      <div class="row"><span class="label">Scanner</span><span class="val" id="stat-scanner">INACTIVE</span></div>
+      <div class="row"><span class="label">MT5</span><span class="val" id="stat-mt5">DISCONNECTED</span></div>
+      <div class="row"><span class="label">Cloud</span><span class="val" id="stat-cloud">CHECKING…</span></div>
+      <div class="row"><span class="label">Symbol</span><span class="val" id="stat-symbol">—</span></div>
+      <div class="row"><span class="label">Last Sync</span><span class="val mono" id="stat-lastsync">—</span></div>
+    </div>
+
+    <div class="nav-grid">
+      <button class="card nav-card" data-view="analytics"><div class="icon">📊</div><div class="label">ANALYTICS</div></button>
+      <button class="card nav-card" data-view="live">🟢<div class="label">LIVE TRADING</div></button>
+      <button class="card nav-card" data-view="performance">📈<div class="label">PERFORMANCE</div></button>
+      <button class="card nav-card" data-view="analytics">🧠<div class="label">SMART MONEY SCANNER</div></button>
+    </div>
+
+    <div class="card" id="engines-card">
+      <h3>Strategy Engine Status</h3>
+      <div id="engine-list"></div>
+    </div>
+  </section>
+
+  <!-- ================= MT5 CONNECTION VIEW ================= -->
+  <section id="view-mt5" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">MT5 Connection</div></div>
+
+    <div class="card" id="mt5-disconnected-card">
+      <h3>Connect MT5</h3>
+      <p class="footer-note" style="text-align:left;margin-top:0;">1. Tap "Generate Pairing Token" below.<br>2. Paste the token into the EA's <span class="mono">InpDeviceToken</span> input in MT5.<br>3. Attach <span class="mono">MORDECAI_EA_SCANNER.mq5</span> to a chart. Your MT5 password never leaves your terminal.</p>
+      <button id="btn-pair" class="btn btn-start btn-block" style="margin-top:12px;">GENERATE PAIRING TOKEN</button>
+      <div id="pairing-token-box" class="hidden" style="margin-top:12px;">
+        <div class="field"><label>Device Token — paste into EA</label><input id="pairing-token" readonly class="mono"></div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="mt5-connected-card">
+      <h3>Account</h3>
+      <div class="row"><span class="label">Broker</span><span class="val" id="mt5-broker">—</span></div>
+      <div class="row"><span class="label">Account</span><span class="val mono" id="mt5-account">—</span></div>
+      <div class="row"><span class="label">Server</span><span class="val" id="mt5-server">—</span></div>
+      <div class="row"><span class="label">Currency</span><span class="val" id="mt5-currency">—</span></div>
+      <div class="row"><span class="label">Balance</span><span class="val mono" id="mt5-balance">—</span></div>
+      <div class="row"><span class="label">Equity</span><span class="val mono" id="mt5-equity">—</span></div>
+      <div class="row"><span class="label">Last Sync</span><span class="val mono" id="mt5-lastsync">—</span></div>
+      <div class="row"><span class="label">Status</span><span class="badge" id="mt5-status-badge">● CONNECTED</span></div>
+      <button id="btn-mt5-logout" class="btn btn-stop btn-block" style="margin-top:14px;">LOGOUT</button>
+    </div>
+  </section>
+
+  <!-- ================= ANALYTICS / SMART MONEY SCANNER VIEW ================= -->
+  <section id="view-analytics" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">AI Deep-Scan</div></div>
+
+    <div class="card" id="analytics-form-card">
+      <h3>Setup</h3>
+      <div class="field"><label>Symbol</label>
+        <select id="an-symbol">
+          <option>EURUSD</option><option>GBPUSD</option><option>USDJPY</option><option>AUDUSD</option>
+          <option>USDCHF</option><option>USDCAD</option><option>NZDUSD</option><option>XAUUSD</option>
+          <option>US30</option><option>NAS100</option><option>BTCUSD</option>
+        </select>
+      </div>
+      <div class="field"><label>Timeframe</label>
+        <select id="an-timeframe"><option>M1</option><option>M5</option><option>M15</option><option>M30</option><option>H1</option><option selected>H4</option></select>
+      </div>
+      <div class="field"><label>Balance</label><input id="an-balance" type="number" placeholder="e.g. 50"></div>
+      <div class="field"><label>Lot Size</label><input id="an-lot" type="number" step="0.01" placeholder="e.g. 0.01"></div>
+      <div class="field"><label>Number of Positions</label><input id="an-positions" type="number" value="1"></div>
+      <div class="field"><label>Risk %</label><input id="an-risk" type="number" placeholder="e.g. 1"></div>
+      <div class="field"><label>Target (pips, $, or RR)</label><input id="an-target" type="text" placeholder="e.g. 50 pips"></div>
+
+      <div class="field"><label>Chart Screenshot</label>
+        <label class="upload-zone" id="upload-zone" for="an-file">Tap to upload chart screenshot</label>
+        <input type="file" id="an-file" accept="image/*" class="hidden">
+      </div>
+
+      <button id="btn-analyze" class="btn btn-start btn-block">RUN AI DEEP-SCAN</button>
+    </div>
+
+    <!-- Scanning state -->
+    <div class="card hidden" id="analytics-scanning-card">
+      <h3>Analyzing <span id="scan-symbol-label"></span></h3>
+      <div class="progress-track"><div class="progress-fill" id="scan-progress" style="width:0%"></div></div>
+      <div id="scan-steps"></div>
+    </div>
+
+    <!-- Result state -->
+    <div class="card hidden" id="analytics-result-card">
+      <div class="conf-wrap">
+        <div class="conf-ring" id="conf-ring" style="--pct:0;"><div class="inner"><div class="num" id="conf-num">0</div><div class="cap">CONF</div></div></div>
+        <div>
+          <div class="verdict no" id="result-verdict">NO TRADE</div>
+          <div class="footer-note" style="text-align:left;margin:4px 0 0;" id="result-rr"></div>
+        </div>
+      </div>
+      <div id="result-rows" style="margin-top:14px;"></div>
+      <div id="result-conflict" class="hidden" style="margin-top:10px;color:var(--yellow);font-size:13px;"></div>
+      <h3 style="margin-top:16px;">Why This Signal Exists</h3>
+      <div id="result-reasoning"></div>
+    </div>
+
+    <div class="card hidden" id="analytics-insufficient-card">
+      <h3 style="color:var(--yellow);">Insufficient Chart Data</h3>
+      <ul id="insufficient-list" style="padding-left:18px;font-size:13px;color:var(--text-dim);"></ul>
+    </div>
+  </section>
+
+  <!-- ================= LIVE TRADING VIEW ================= -->
+  <section id="view-live" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">Live Trading</div></div>
+    <div class="card">
+      <div class="row"><span class="label">Connection</span><span class="badge" id="live-conn-badge">● OFFLINE</span></div>
+      <div class="row"><span class="label">Balance</span><span class="val mono" id="live-balance">—</span></div>
+      <div class="row"><span class="label">Equity</span><span class="val mono" id="live-equity">—</span></div>
+      <div class="row"><span class="label">Open Positions</span><span class="val mono" id="live-openpos">—</span></div>
+      <div class="row"><span class="label">Floating P/L</span><span class="val mono" id="live-floating">—</span></div>
+    </div>
+    <div class="card">
+      <h3>Open Positions</h3>
+      <div id="live-positions-list"><p class="footer-note">No open positions.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= PERFORMANCE VIEW ================= -->
+  <section id="view-performance" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">Performance</div></div>
+    <div class="card">
+      <div class="row"><span class="label">Today</span><span class="val mono" id="perf-today">—</span></div>
+      <div class="row"><span class="label">This Week</span><span class="val mono" id="perf-week">—</span></div>
+      <div class="row"><span class="label">This Month</span><span class="val mono" id="perf-month">—</span></div>
+      <div class="row"><span class="label">Win Rate</span><span class="val mono" id="perf-winrate">—</span></div>
+      <div class="row"><span class="label">Profit Factor</span><span class="val mono" id="perf-pf">—</span></div>
+      <div class="row"><span class="label">Total Trades</span><span class="val mono" id="perf-total">—</span></div>
+    </div>
+    <div class="card">
+      <h3>Trade History</h3>
+      <div id="perf-history-list"><p class="footer-note">No synced trades yet.</p></div>
+    </div>
+  </section>
+
+  <!-- ================= SIGNAL HISTORY VIEW ================= -->
+  <section id="view-signals" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">Signal History</div></div>
+    <div id="signals-list"></div>
+  </section>
+
+  <!-- ================= SETTINGS VIEW ================= -->
+  <section id="view-settings" class="view">
+    <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">Settings</div></div>
+    <div class="card">
+      <h3>Backend URL</h3>
+      <div class="field"><input id="settings-backend-url" placeholder="https://your-backend.example.com"></div>
+      <button id="btn-save-backend" class="btn btn-start btn-block">SAVE</button>
+    </div>
+    <div class="card">
+      <h3>Theme Color</h3>
+      <div class="theme-swatches">
+        <button class="swatch" data-theme="red" style="background:#ff2b3d;"></button>
+        <button class="swatch" data-theme="blue" style="background:#2b7dff;"></button>
+        <button class="swatch" data-theme="purple" style="background:#a23bff;"></button>
+        <button class="swatch" data-theme="green" style="background:#22e07a;"></button>
+        <button class="swatch" data-theme="cyan" style="background:#22d3ee;"></button>
+        <button class="swatch" data-theme="orange" style="background:#ff8a2b;"></button>
+      </div>
+    </div>
+    <div class="card">
+      <button id="btn-logout" class="btn btn-stop btn-block">LOG OUT</button>
+    </div>
+  </section>
+
+  <!-- ================= DRAWER MENU ================= -->
+  <div class="drawer-overlay hidden" id="drawer-overlay"></div>
+  <div class="drawer hidden" id="drawer">
+    <h2>MORDECAI_EA SCANNER</h2>
+    <button class="item" data-view="dashboard">🏠 Dashboard</button>
+    <button class="item" data-view="analytics">📊 Analytics</button>
+    <button class="item" data-view="analytics">🧠 Smart Money Scanner</button>
+    <button class="item" data-view="live">🟢 Live Trading</button>
+    <button class="item" data-view="performance">📈 Performance</button>
+    <button class="item" data-view="performance">🕒 Trade History</button>
+    <button class="item" data-view="signals">📜 Signal History</button>
+    <button class="item" data-view="mt5">🔌 MT5 Connection</button>
+    <button class="item" data-view="settings">⚙️ Settings</button>
+    <button class="item" id="drawer-logout">🚪 Logout</button>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
