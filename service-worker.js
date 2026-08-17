@@ -1,9 +1,15 @@
-const CACHE = 'mordecai-shell-v1';
-const SHELL = ['./', './index.html', './styles.css', './app.js', './manifest.json',
+const CACHE = 'mordecai-shell-v2';
+const SHELL = ['./', './index.html', './styles.css', './app.js', './logo-data.js', './manifest.json',
                './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)));
+  // Cache each shell file independently so one missing/renamed file can't
+  // reject the whole install and leave the app uninstallable.
+  e.waitUntil(
+    caches.open(CACHE).then((cache) =>
+      Promise.all(SHELL.map((url) => cache.add(url).catch((err) => console.warn('SW: skip', url, err))))
+    )
+  );
   self.skipWaiting();
 });
 

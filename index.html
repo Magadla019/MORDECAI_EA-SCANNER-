@@ -9,6 +9,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="styles.css">
+<script src="logo-data.js"></script>
 </head>
 <body>
 <div class="app">
@@ -16,7 +17,7 @@
   <!-- ================= LOGIN VIEW ================= -->
   <section id="view-login" class="view active">
     <div class="hero">
-      <div class="ring"><img src="icons/icon-512.png" alt="MORDECAI"></div>
+      <div class="ring"><img id="login-avatar" alt="MORDECAI"></div>
       <h1 class="brand-title" style="font-size:22px;font-weight:700;letter-spacing:1px;">MORDECAI<span style="color:var(--accent)">_EA</span> SCANNER</h1>
       <div class="sub" style="letter-spacing:3px;font-size:11px;color:var(--text-dim);margin-top:4px;">SMART MONEY CONCEPTS</div>
       <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
@@ -26,45 +27,76 @@
       <div class="field"><label>Email</label><input id="auth-email" type="email" autocomplete="username"></div>
       <div class="field"><label>Password</label><input id="auth-password" type="password" autocomplete="current-password"></div>
       <button id="auth-submit" class="btn btn-start btn-block">SIGN IN</button>
-      <button id="auth-toggle" class="btn-secondary btn-block" style="margin-top:10px;">Need an account? Register</button>
+      <button id="auth-toggle" class="btn-secondary btn-block hidden" style="margin-top:10px;">Need an account? Register</button>
       <p id="auth-error" class="footer-note" style="color:#ef4444;"></p>
+      <p class="footer-note">Registration is off for now — sign-in only.</p>
     </div>
     <p class="footer-note">Set your backend URL once in Settings after signing in.<br>This tool never places, closes, or modifies trades automatically.</p>
   </section>
 
   <!-- ================= DASHBOARD VIEW ================= -->
   <section id="view-dashboard" class="view">
-    <div class="topbar">
+    <div class="topbar-simple">
       <button class="menu-btn" id="open-menu">☰</button>
-      <div class="brand"><h1>MORDECAI<span>_EA</span></h1><div class="sub">SMART MONEY CONCEPTS</div></div>
-      <div class="status-dot"><span class="dot off" id="conn-dot"></span></div>
+      <div class="header-pill">
+        <img id="header-avatar" alt="MORDECAI">
+        <div><div class="hp-title">MORDECAI<span>_EA</span> SCANNER</div><div class="hp-sub">SMART MONEY CONCEPTS</div></div>
+      </div>
+      <div style="width:42px;"></div>
     </div>
 
-    <div class="hero" style="padding-top:0;">
-      <div class="ring" style="width:110px;height:110px;"><img src="icons/icon-512.png" alt="MORDECAI"></div>
+    <div class="hero">
+      <div class="ring"><img id="hero-avatar" alt="MORDECAI"></div>
+      <div class="hero-name">MORDECAI<span>_EA</span> SCANNER</div>
       <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
-      <div class="run-state stopped" id="run-state">NOT RUNNING</div>
+      <div class="run-state stopped" id="run-state"><span class="run-dot"></span>NOT RUNNING</div>
     </div>
 
-    <div class="btn-row">
-      <button class="btn btn-start" id="btn-start">START</button>
-      <button class="btn btn-stop" id="btn-stop">STOP</button>
+    <div class="icon-btn-row">
+      <button class="icon-circle" data-view="analytics">
+        <span class="icon-circle-glyph">📊</span><span class="icon-circle-label">ANALYTICS</span>
+      </button>
+      <button class="icon-circle icon-circle-main" id="btn-toggle-run">
+        <span class="icon-circle-glyph" id="toggle-glyph">▶</span><span class="icon-circle-label" id="toggle-label">START</span>
+      </button>
+      <button class="icon-circle" id="btn-reset">
+        <span class="icon-circle-glyph">🗑</span><span class="icon-circle-label">RESET</span>
+      </button>
     </div>
 
-    <div class="card">
+    <div class="powered-badge-wrap"><span class="powered-badge">Powered by <b>MORDECAI AI ENGINE</b></span></div>
+
+    <div class="list-rows">
+      <button class="list-row" data-view="mt5">
+        <img class="lr-thumb" id="list-avatar" alt="">
+        <div class="lr-mid"><div class="lr-title">MORDECAI_EA SCANNER</div><div class="lr-sub run-color" id="lr-status">RUNNING</div></div>
+        <span class="lr-chevron">›</span>
+      </button>
+      <button class="list-row" data-view="live">
+        <div class="lr-icon">📈</div>
+        <div class="lr-mid"><div class="lr-title" id="lr-live-symbol">XAUUSD · M15</div><div class="lr-sub">Live Trading</div></div>
+        <svg class="lr-spark" id="lr-spark" viewBox="0 0 80 28" preserveAspectRatio="none"></svg>
+        <span class="lr-chevron">›</span>
+      </button>
+      <button class="list-row" data-view="performance">
+        <div class="lr-icon">🎯</div>
+        <div class="lr-mid"><div class="lr-title">PERFORMANCE</div><div class="lr-sub">Today's P/L</div></div>
+        <div class="lr-value mono" id="lr-pl">—</div>
+        <span class="lr-chevron">›</span>
+      </button>
+      <button class="list-row" data-view="analytics">
+        <div class="lr-icon">📊</div>
+        <div class="lr-mid"><div class="lr-title">SMART MONEY SCANNER</div><div class="lr-sub">AI-powered market analysis</div></div>
+        <span class="lr-bubble">💬</span>
+      </button>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
       <h3>System Status</h3>
-      <div class="row"><span class="label">Scanner</span><span class="val" id="stat-scanner">INACTIVE</span></div>
       <div class="row"><span class="label">MT5</span><span class="val" id="stat-mt5">DISCONNECTED</span></div>
       <div class="row"><span class="label">Cloud</span><span class="val" id="stat-cloud">CHECKING…</span></div>
       <div class="row"><span class="label">Symbol</span><span class="val" id="stat-symbol">—</span></div>
       <div class="row"><span class="label">Last Sync</span><span class="val mono" id="stat-lastsync">—</span></div>
-    </div>
-
-    <div class="nav-grid">
-      <button class="card nav-card" data-view="analytics"><div class="icon">📊</div><div class="label">ANALYTICS</div></button>
-      <button class="card nav-card" data-view="live">🟢<div class="label">LIVE TRADING</div></button>
-      <button class="card nav-card" data-view="performance">📈<div class="label">PERFORMANCE</div></button>
-      <button class="card nav-card" data-view="analytics">🧠<div class="label">SMART MONEY SCANNER</div></button>
     </div>
 
     <div class="card" id="engines-card">

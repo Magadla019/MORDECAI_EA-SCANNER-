@@ -20,6 +20,10 @@ export function requireAuth(req, res, next) {
 }
 
 router.post('/register', async (req, res) => {
+  // Turn back on later by setting REGISTRATION_ENABLED=true in .env
+  if (process.env.REGISTRATION_ENABLED !== 'true') {
+    return res.status(403).json({ error: 'Registration is currently disabled' });
+  }
   const { email, password } = req.body;
   if (!email || !password || password.length < 8) {
     return res.status(400).json({ error: 'Email and a password of 8+ characters are required' });
