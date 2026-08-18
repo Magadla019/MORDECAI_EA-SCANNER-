@@ -18,6 +18,15 @@ const state = {
   pollTimer: null
 };
 
+// ---------------- logo wiring (base64-embedded, never depends on file paths) ----------------
+function wireLogos() {
+  const src = window.MORDECAI_LOGO_HERO || 'icons/icon-512.png';
+  const avatarSrc = window.MORDECAI_LOGO_AVATAR || 'icons/icon-192.png';
+  ['login-avatar', 'hero-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
+  ['header-avatar', 'list-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatarSrc; });
+}
+wireLogos();
+
 // ---------------- helpers ----------------
 function api(path, opts = {}) {
   if (!state.backendUrl) throw new Error('Set your backend URL in Settings first');
@@ -135,7 +144,6 @@ document.getElementById('btn-save-backend').addEventListener('click', () => {
 });
 
 // ---------------- START / STOP ----------------
-const runState = document.getElementById('run-state');
 const engineList = document.getElementById('engine-list');
 const ENGINES = ['MARKET STRUCTURE','LIQUIDITY ENGINE','ORDER BLOCK ENGINE','FVG ENGINE','MOMENTUM ENGINE',
                   'EMA FILTER','ATR ENGINE','SESSION ENGINE','NEWS ENGINE','RISK ENGINE'];
@@ -149,30 +157,45 @@ function renderEngines(active) {
 function setRunning(running) {
   state.running = running;
   localStorage.setItem(STORAGE.running, String(running));
-  runState.textContent = running ? 'RUNNING ●' : 'NOT RUNNING';
+
+  const runState = document.getElementById('run-state');
   runState.className = 'run-state ' + (running ? 'running' : 'stopped');
-  document.getElementById('stat-scanner').textContent = running ? 'ACTIVE' : 'INACTIVE';
+  runState.innerHTML = `<span class="run-dot"></span>${running ? 'RUNNING ●' : 'NOT RUNNING'}`;
+
+  const mainBtn = document.getElementById('btn-toggle-run');
+  mainBtn.classList.toggle('is-running', running);
+  document.getElementById('toggle-glyph').textContent = running ? '■' : '▶';
+  document.getElementById('toggle-label').textContent = running ? 'STOP' : 'START';
+
+  const lrStatus = document.getElementById('lr-status');
+  if (lrStatus) { lrStatus.textContent = running ? 'RUNNING' : 'STOPPED'; lrStatus.classList.toggle('run-color', running); }
+
   renderEngines(running);
 }
 
-document.getElementById('btn-start').addEventListener('click', async () => {
-  runState.textContent = 'SYNCING…';
-  try { await refreshMt5Status(); } catch {}
-  setRunning(true);
+document.getElementById('btn-toggle-run').addEventListener('click', async () => {
+  if (!state.running) {
+    document.getElementById('run-state').innerHTML = '<span class="run-dot"></span>SYNCING…';
+    try { await refreshMt5Status(); } catch {}
+    setRunning(true);
+  } else {
+    // STOP only pauses scanning/polling in this app. It never touches MT5 positions -
+    // there is no code path here or in the backend that can close/modify a trade.
+    setRunning(false);
+  }
 });
-document.getElementById('btn-stop').addEventListener('click', () => {
-  // STOP only pauses scanning/polling in this app. It never touches MT5 positions -
-  // there is no code path here or in the backend that can close/modify a trade.
-  setRunning(false);
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (confirm('Reset the local session? This stops the scanner but does not delete your synced MT5 history or performance data.')) {
+    setRunning(false);
+  }
 });
 
 // ---------------- MT5 status polling ----------------
 async function refreshMt5Status() {
-  if (!state.token || !state.backendUrl) return null;
+  if (!state.backendUrl) return null;
   try {
     const s = await api('/api/sync/status');
-    const dot = document.getElementById('conn-dot');
-    dot.className = 'dot ' + (s.connected ? 'on' : 'off');
     document.getElementById('stat-mt5').textContent = s.connected ? 'CONNECTED' : 'DISCONNECTED';
     document.getElementById('stat-cloud').textContent = 'CONNECTED';
     document.getElementById('stat-lastsync').textContent = fmtTime(s.lastSync);
@@ -180,17 +203,56 @@ async function refreshMt5Status() {
     return s;
   } catch (e) {
     document.getElementById('stat-cloud').textContent = 'CLOUD OFFLINE';
-    document.getElementById('conn-dot').className = 'dot off';
     return null;
   }
 }
 
 function startPolling() {
   refreshMt5Status();
+  refreshDashboardExtras();
   stopPolling();
-  state.pollTimer = setInterval(refreshMt5Status, 8000);
+  state.pollTimer = setInterval(() => { refreshMt5Status(); refreshDashboardExtras(); }, 8000);
 }
 function stopPolling() { if (state.pollTimer) clearInterval(state.pollTimer); }
+
+async function refreshDashboardExtras() {
+  const s = await refreshMt5Status().catch(() => null);
+  const symLabel = document.getElementById('lr-live-symbol');
+  if (symLabel) symLabel.textContent = s?.openPositions?.[0]?.symbol ? `${s.openPositions[0].symbol} · Live` : 'No open positions';
+
+  const plEl = document.getElementById('lr-pl');
+  const sparkEl = document.getElementById('lr-spark');
+  try {
+    const sum = await api('/api/performance/summary');
+    if (sum.hasData) {
+      plEl.textContent = money(sum.todayPL);
+      plEl.className = 'lr-value mono ' + (sum.todayPL >= 0 ? 'pos' : 'neg');
+      drawSparkline(sparkEl, sum.equityCurve || []);
+    } else {
+      plEl.textContent = '—';
+      drawSparkline(sparkEl, []);
+    }
+  } catch {
+    if (plEl) plEl.textContent = '—';
+    if (sparkEl) drawSparkline(sparkEl, []);
+  }
+}
+
+// Draws only from real synced equity-curve points - never fabricated data.
+// With no data it draws a flat neutral line rather than inventing a trend.
+function drawSparkline(svgEl, points) {
+  if (!svgEl) return;
+  if (!points.length) {
+    svgEl.innerHTML = `<line x1="0" y1="14" x2="80" y2="14" stroke="currentColor" stroke-dasharray="2,3" opacity="0.3"/>`;
+    return;
+  }
+  const values = points.map(p => p.equity ?? p.balance ?? 0);
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = max - min || 1;
+  const step = 80 / Math.max(1, values.length - 1);
+  const path = values.map((v, i) => `${(i * step).toFixed(1)},${(26 - ((v - min) / range) * 24).toFixed(1)}`).join(' ');
+  svgEl.innerHTML = `<polyline points="${path}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
 
 // ---------------- MT5 connection view ----------------
 document.getElementById('btn-pair').addEventListener('click', async () => {
