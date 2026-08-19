@@ -8,6 +8,7 @@ import syncRoutes from './routes/sync.js';
 import analyzeRoutes from './routes/analyze.js';
 import signalsRoutes from './routes/signals.js';
 import performanceRoutes from './routes/performance.js';
+import mt5linkRoutes from './routes/mt5link.js';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/api/sync', syncRoutes);
 app.use('/api/analyze', analyzeRoutes);
 app.use('/api/signals', signalsRoutes);
 app.use('/api/performance', performanceRoutes);
+app.use('/api/mt5', mt5linkRoutes);
 
 // This backend intentionally has no endpoint that places, closes, or modifies
 // MT5 trades. All execution happens manually, by the user, inside MT5.

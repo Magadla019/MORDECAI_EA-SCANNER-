@@ -12,6 +12,8 @@
 <script src="logo-data.js"></script>
 </head>
 <body>
+<div class="bg-layer" id="bg-layer"></div>
+<div class="bg-overlay"></div>
 <div class="app">
 
   <!-- ================= LOGIN VIEW ================= -->
@@ -59,13 +61,17 @@
 
     <div class="icon-btn-row">
       <button class="icon-circle" data-view="analytics">
-        <span class="icon-circle-glyph">📊</span><span class="icon-circle-label">ANALYTICS</span>
+        <span class="icon-circle-glyph">
+          <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="12" width="4" height="9" rx="1" fill="#3ba9ff"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#22e07a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ff2b3d"/></svg>
+        </span><span class="icon-circle-label">ANALYTICS</span>
       </button>
       <button class="icon-circle icon-circle-main" id="btn-toggle-run">
-        <span class="icon-circle-glyph" id="toggle-glyph">▶</span><span class="icon-circle-label" id="toggle-label">START</span>
+        <span class="icon-circle-glyph" id="toggle-glyph"><svg id="toggle-svg" viewBox="0 0 24 24" width="26" height="26"><polygon points="7,4 20,12 7,20" fill="#fff"/></svg></span><span class="icon-circle-label" id="toggle-label">START</span>
       </button>
       <button class="icon-circle" id="btn-reset">
-        <span class="icon-circle-glyph">🗑</span><span class="icon-circle-label">RESET</span>
+        <span class="icon-circle-glyph">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" fill="none" stroke="#ff2b3d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span><span class="icon-circle-label">RESET</span>
       </button>
     </div>
 
@@ -78,19 +84,19 @@
         <span class="lr-chevron">›</span>
       </button>
       <button class="list-row" data-view="live">
-        <div class="lr-icon">📈</div>
+        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="9" width="3" height="10" fill="#22e07a"/><rect x="8" y="4" width="3" height="15" fill="#ff2b3d"/><rect x="13" y="12" width="3" height="7" fill="#22e07a"/><rect x="18" y="2" width="3" height="17" fill="#ff2b3d"/></svg></div>
         <div class="lr-mid"><div class="lr-title" id="lr-live-symbol">XAUUSD · M15</div><div class="lr-sub">Live Trading</div></div>
         <svg class="lr-spark" id="lr-spark" viewBox="0 0 80 28" preserveAspectRatio="none"></svg>
         <span class="lr-chevron">›</span>
       </button>
       <button class="list-row" data-view="performance">
-        <div class="lr-icon">🎯</div>
+        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="9" fill="none" stroke="#ff2b3d" stroke-width="1.6"/><circle cx="12" cy="12" r="5" fill="none" stroke="#ff2b3d" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="#ff2b3d"/></svg></div>
         <div class="lr-mid"><div class="lr-title">PERFORMANCE</div><div class="lr-sub">Today's P/L</div></div>
         <div class="lr-value mono" id="lr-pl">—</div>
         <span class="lr-chevron">›</span>
       </button>
       <button class="list-row" data-view="analytics">
-        <div class="lr-icon">📊</div>
+        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="12" width="4" height="9" rx="1" fill="#3ba9ff"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#22e07a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ff2b3d"/></svg></div>
         <div class="lr-mid"><div class="lr-title">SMART MONEY SCANNER</div><div class="lr-sub">AI-powered market analysis</div></div>
         <span class="lr-bubble">💬</span>
       </button>
@@ -114,17 +120,43 @@
   <section id="view-mt5" class="view">
     <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">MT5 Connection</div></div>
 
-    <div class="card" id="mt5-disconnected-card">
-      <h3>Connect MT5</h3>
-      <p class="footer-note" style="text-align:left;margin-top:0;">1. Tap "Generate Pairing Token" below.<br>2. Paste the token into the EA's <span class="mono">InpDeviceToken</span> input in MT5.<br>3. Attach <span class="mono">MORDECAI_EA_SCANNER.mq5</span> to a chart. Your MT5 password never leaves your terminal.</p>
-      <button id="btn-pair" class="btn btn-start btn-block" style="margin-top:12px;">GENERATE PAIRING TOKEN</button>
-      <div id="pairing-token-box" class="hidden" style="margin-top:12px;">
-        <div class="field"><label>Device Token — paste into EA</label><input id="pairing-token" readonly class="mono"></div>
+    <div class="card hidden" id="mt5-disconnected-card">
+      <div class="mt5-tabs">
+        <button class="mt5-tab active" data-mt5tab="login">LOGIN (No Laptop Needed)</button>
+        <button class="mt5-tab" data-mt5tab="ea">EA / VPS (Advanced)</button>
+      </div>
+
+      <!-- ---- Login-based (MetaApi) — matches reference screenshot ---- -->
+      <div id="mt5tab-login">
+        <div class="mt5-hero">
+          <div class="mt5-hero-dot"><span class="dot off" id="mt5-hero-dot"></span><span id="mt5-hero-status">NOT CONNECTED</span></div>
+          <div class="mt5-logo-ring"><svg viewBox="0 0 24 24" width="34" height="34"><circle cx="12" cy="12" r="10" fill="none" stroke="var(--accent)" stroke-width="1.6"/><path d="M8 8 12 12 8 16M16 8v8" stroke="var(--accent)" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3 style="text-align:center;color:var(--accent);font-size:16px;letter-spacing:1.5px;margin-top:10px;">MT5 LOGIN DETAILS</h3>
+        </div>
+
+        <div class="field"><label>Login (Account Number)</label><input id="link-login" type="number" inputmode="numeric" placeholder="e.g. 3204917"></div>
+        <div class="field"><label>Investor Password (read-only)</label><input id="link-password" type="password" placeholder="Not your trading password"></div>
+        <div class="field"><label>Server</label><input id="link-server" type="text" placeholder="e.g. AccuMarkets-Live"></div>
+        <p class="footer-note" style="text-align:left;margin:0 0 12px;color:var(--yellow);">Use the <b>Investor Password</b> from your MT5 app (Account → right-click → Manage Accounts → Change Password → Investor). It can only view your account — it can never place a trade, even by mistake.</p>
+
+        <button id="btn-link-mt5" class="btn btn-start btn-block">LINK MT5 ACCOUNT DETAILS</button>
+        <p id="link-error" class="footer-note" style="color:#ef4444;"></p>
+      </div>
+
+      <!-- ---- EA-based (self-hosted terminal / VPS) ---- -->
+      <div id="mt5tab-ea" class="hidden">
+        <h3>Connect via EA</h3>
+        <p class="footer-note" style="text-align:left;margin-top:0;">For clients running MT5 themselves, or on a Windows VPS (does not need to be a laptop — a $5-15/mo VPS running 24/7 works too):<br>1. Tap "Generate Pairing Token" below.<br>2. Paste the token into the EA's <span class="mono">InpDeviceToken</span> input in MT5.<br>3. Attach <span class="mono">MORDECAI_EA_SCANNER.mq5</span> to a chart. The MT5 password never leaves that terminal.</p>
+        <button id="btn-pair" class="btn btn-start btn-block" style="margin-top:12px;">GENERATE PAIRING TOKEN</button>
+        <div id="pairing-token-box" class="hidden" style="margin-top:12px;">
+          <div class="field"><label>Device Token — paste into EA</label><input id="pairing-token" readonly class="mono"></div>
+        </div>
       </div>
     </div>
 
     <div class="card hidden" id="mt5-connected-card">
       <h3>Account</h3>
+      <div class="row"><span class="label">Method</span><span class="val" id="mt5-method">—</span></div>
       <div class="row"><span class="label">Broker</span><span class="val" id="mt5-broker">—</span></div>
       <div class="row"><span class="label">Account</span><span class="val mono" id="mt5-account">—</span></div>
       <div class="row"><span class="label">Server</span><span class="val" id="mt5-server">—</span></div>
@@ -133,6 +165,7 @@
       <div class="row"><span class="label">Equity</span><span class="val mono" id="mt5-equity">—</span></div>
       <div class="row"><span class="label">Last Sync</span><span class="val mono" id="mt5-lastsync">—</span></div>
       <div class="row"><span class="label">Status</span><span class="badge" id="mt5-status-badge">● CONNECTED</span></div>
+      <button id="btn-refresh-mt5" class="btn-secondary btn-block hidden" style="margin-top:10px;">REFRESH NOW</button>
       <button id="btn-mt5-logout" class="btn btn-stop btn-block" style="margin-top:14px;">LOGOUT</button>
     </div>
   </section>

@@ -21,6 +21,11 @@ CREATE TABLE IF NOT EXISTS mt5_connections (
   status TEXT NOT NULL DEFAULT 'disconnected', -- connected | connecting | disconnected
   last_sync_at INTEGER,
   last_deal_id INTEGER DEFAULT 0,
+  link_method TEXT NOT NULL DEFAULT 'ea', -- 'ea' (EA data bridge) | 'login' (MetaApi, no terminal needed)
+  metaapi_account_id TEXT,                -- MetaApi's account id once provisioned
+  encrypted_investor_password TEXT,       -- AES-256-GCM ciphertext, never plaintext
+  encrypted_iv TEXT,
+  encrypted_authtag TEXT,
   created_at INTEGER NOT NULL
 );
 

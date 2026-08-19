@@ -24,6 +24,8 @@ function wireLogos() {
   const avatarSrc = window.MORDECAI_LOGO_AVATAR || 'icons/icon-192.png';
   ['login-avatar', 'hero-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
   ['header-avatar', 'list-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatarSrc; });
+  const bg = document.getElementById('bg-layer');
+  if (bg) bg.style.backgroundImage = `url(${src})`;
 }
 wireLogos();
 
@@ -164,7 +166,9 @@ function setRunning(running) {
 
   const mainBtn = document.getElementById('btn-toggle-run');
   mainBtn.classList.toggle('is-running', running);
-  document.getElementById('toggle-glyph').textContent = running ? '■' : '▶';
+  document.getElementById('toggle-glyph').innerHTML = running
+    ? '<svg viewBox="0 0 24 24" width="22" height="22"><rect x="5" y="5" width="14" height="14" rx="2" fill="#fff"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="26" height="26"><polygon points="7,4 20,12 7,20" fill="#fff"/></svg>';
   document.getElementById('toggle-label').textContent = running ? 'STOP' : 'START';
 
   const lrStatus = document.getElementById('lr-status');
@@ -254,6 +258,49 @@ function drawSparkline(svgEl, points) {
   svgEl.innerHTML = `<polyline points="${path}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
 }
 
+// ---------------- MT5 connection view: login tab vs EA tab ----------------
+document.querySelectorAll('[data-mt5tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-mt5tab]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('mt5tab-login').classList.toggle('hidden', btn.dataset.mt5tab !== 'login');
+    document.getElementById('mt5tab-ea').classList.toggle('hidden', btn.dataset.mt5tab !== 'ea');
+  });
+});
+
+document.getElementById('btn-link-mt5').addEventListener('click', async () => {
+  const login = document.getElementById('link-login').value.trim();
+  const investorPassword = document.getElementById('link-password').value;
+  const server = document.getElementById('link-server').value.trim();
+  const errEl = document.getElementById('link-error');
+  errEl.textContent = '';
+
+  if (!login || !investorPassword || !server) {
+    errEl.textContent = 'Login, investor password, and server are all required.';
+    return;
+  }
+
+  const btn = document.getElementById('btn-link-mt5');
+  btn.textContent = 'LINKING…';
+  try {
+    await api('/api/mt5/link', { method: 'POST', body: JSON.stringify({ login, investorPassword, server }) });
+    document.getElementById('link-password').value = '';
+    await refreshMt5View();
+  } catch (e) {
+    errEl.textContent = e.message;
+  } finally {
+    btn.textContent = 'LINK MT5 ACCOUNT DETAILS';
+  }
+});
+
+document.getElementById('btn-refresh-mt5').addEventListener('click', async () => {
+  try {
+    const s = await api('/api/sync/status');
+    if (s.connectionId) await api(`/api/mt5/${s.connectionId}/refresh`, { method: 'POST' });
+    await refreshMt5View();
+  } catch (e) { alert(e.message); }
+});
+
 // ---------------- MT5 connection view ----------------
 document.getElementById('btn-pair').addEventListener('click', async () => {
   try {
@@ -277,6 +324,7 @@ async function refreshMt5View() {
   document.getElementById('mt5-disconnected-card').classList.toggle('hidden', !!connected);
   document.getElementById('mt5-connected-card').classList.toggle('hidden', !connected);
   if (connected) {
+    document.getElementById('mt5-method').textContent = s.linkMethod === 'login' ? 'LOGIN (MetaApi)' : 'EA / VPS';
     document.getElementById('mt5-broker').textContent = s.broker || '—';
     document.getElementById('mt5-account').textContent = s.account || '—';
     document.getElementById('mt5-server').textContent = s.server || '—';
@@ -284,6 +332,7 @@ async function refreshMt5View() {
     document.getElementById('mt5-balance').textContent = money(s.balance, s.currency);
     document.getElementById('mt5-equity').textContent = money(s.equity, s.currency);
     document.getElementById('mt5-lastsync').textContent = fmtTime(s.lastSync);
+    document.getElementById('btn-refresh-mt5').classList.toggle('hidden', s.linkMethod !== 'login');
   }
 }
 

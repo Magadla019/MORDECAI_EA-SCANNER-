@@ -59,14 +59,40 @@ Easiest option — GitHub Pages, since it's already in this repo:
 
 ## 4. Connect MT5
 
-1. In the app: **☰ menu → MT5 Connection → Generate Pairing Token**. Copy it.
+Two ways, pick per client:
+
+### Option A — Login (no laptop/VPS needed, recommended for most clients)
+
+1. Get the client's **Investor Password** (read-only) — in their MT5 app:
+   Account → tap it → Manage Accounts → Change Password → generate/view the
+   **Investor** password (not the main trading password). This password can
+   view balance/positions/history but can never place a trade, even by mistake.
+2. In the app: **☰ menu → MT5 Connection → LOGIN tab**, enter the account
+   number, investor password, and server name (e.g. `AccuMarkets-Live`), tap
+   **LINK MT5 ACCOUNT DETAILS**.
+3. Under the hood this uses [MetaApi.cloud](https://metaapi.cloud) to run the
+   actual MT5 session in their infrastructure — nothing needs to run on the
+   client's device. To enable it:
+   - Sign up free at metaapi.cloud, generate an API token
+   - In `backend/.env`, set `METAAPI_TOKEN` and generate `CREDENTIAL_ENCRYPTION_KEY`
+     with `openssl rand -hex 32`
+   - `npm install metaapi.cloud-sdk` inside `backend/`
+   - Redeploy the backend
+   - MetaApi has a free tier for a handful of accounts; beyond that it's a
+     paid subscription — check their current pricing before onboarding many clients.
+
+### Option B — EA (for clients who do run MT5 themselves, or you run it for them on a VPS)
+
+1. In the app: **☰ menu → MT5 Connection → EA / VPS tab → Generate Pairing Token**. Copy it.
 2. Open `mt5-ea/MORDECAI_EA_SCANNER.mq5` in MetaEditor, compile it, attach it to any
-   chart in MT5 (it doesn't need to be your traded symbol — it reports all watched symbols).
+   chart in MT5 (doesn't need to be a laptop — a cheap Windows VPS, ~$5-15/mo,
+   works fine and runs 24/7 independent of anyone's personal device).
 3. Set its inputs: `InpBackendURL` = your backend URL, `InpDeviceToken` = the pairing token.
 4. In MT5: **Tools → Options → Expert Advisors → Allow WebRequest for listed URL**, add
    your backend URL.
-5. The dashboard's connection dot turns green only once real data has arrived — it's
-   never faked.
+
+Either way, the dashboard's connection dot turns green only once real data has
+arrived — it's never faked.
 
 ## 5. Use it
 
