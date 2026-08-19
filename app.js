@@ -482,3 +482,26 @@ setRunning(state.running);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./service-worker.js').catch(() => {});
 }
+
+// ---------------- Install prompt (fires only once Chrome deems the app eligible) ----------------
+let deferredInstallPrompt = null;
+const installBanner = document.getElementById('install-banner');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  installBanner.classList.remove('hidden');
+});
+
+installBanner.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  installBanner.classList.add('hidden');
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+});
+
+window.addEventListener('appinstalled', () => {
+  installBanner.classList.add('hidden');
+  deferredInstallPrompt = null;
+});
