@@ -18,6 +18,9 @@
 
   <!-- ================= LOGIN VIEW ================= -->
   <section id="view-login" class="view active">
+    <div class="view-header" id="login-back-row" style="display:none;">
+      <button class="back-btn" data-back="dashboard">←</button><div class="view-title">Account</div>
+    </div>
     <div class="hero">
       <div class="ring"><img id="login-avatar" alt="MORDECAI"></div>
       <h1 class="brand-title" style="font-size:22px;font-weight:700;letter-spacing:1px;">MORDECAI<span style="color:var(--accent)">_EA</span> SCANNER</h1>
@@ -29,9 +32,9 @@
       <div class="field"><label>Email</label><input id="auth-email" type="email" autocomplete="username"></div>
       <div class="field"><label>Password</label><input id="auth-password" type="password" autocomplete="current-password"></div>
       <button id="auth-submit" class="btn btn-start btn-block">SIGN IN</button>
-      <button id="auth-toggle" class="btn-secondary btn-block hidden" style="margin-top:10px;">Need an account? Register</button>
+      <button id="auth-toggle" class="btn-secondary btn-block" style="margin-top:10px;">Need an account? Register</button>
       <p id="auth-error" class="footer-note" style="color:#ef4444;"></p>
-      <p class="footer-note">Registration is off for now — sign-in only.</p>
+      <p class="footer-note">You'll stay signed in on this device — no need to log in again next time.</p>
     </div>
     <p class="footer-note">Set your backend URL once in Settings after signing in.<br>This tool never places, closes, or modifies trades automatically.</p>
   </section>
@@ -270,6 +273,34 @@
   <!-- ================= SETTINGS VIEW ================= -->
   <section id="view-settings" class="view">
     <div class="view-header"><button class="back-btn" data-back="dashboard">←</button><div class="view-title">Settings</div></div>
+
+    <div class="card">
+      <h3>Account</h3>
+      <div id="account-signed-out">
+        <p class="footer-note" style="text-align:left;margin:0 0 12px;">Not signed in. Signing in lets you sync settings and is required for MT5 linking.</p>
+        <button id="btn-go-signin" class="btn btn-start btn-block">SIGN IN / REGISTER</button>
+      </div>
+      <div id="account-signed-in" class="hidden">
+        <div class="row"><span class="label">Email</span><span class="val" id="account-email">—</span></div>
+        <div class="row"><span class="label">Session</span><span class="val pos">Always signed in on this device</span></div>
+        <button id="btn-account-logout" class="btn-secondary btn-block" style="margin-top:10px;">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Security</h3>
+      <div class="lock-row">
+        <div>
+          <div class="lr-title" style="font-size:13px;">Pattern Lock</div>
+          <div class="footer-note" style="text-align:left;margin:2px 0 0;">Unlock with a swipe pattern instead of your password, like WhatsApp. Coming soon — disabled for now.</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-pattern-lock" disabled>
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+
     <div class="card">
       <h3>Backend URL</h3>
       <div class="field"><input id="settings-backend-url" placeholder="https://your-backend.example.com"></div>
@@ -287,9 +318,19 @@
       </div>
     </div>
     <div class="card">
+      <div class="lock-row">
+        <div class="lr-title" style="font-size:13px;">Hide Hero Background</div>
+        <label class="switch">
+          <input type="checkbox" id="toggle-hero-bg">
+          <span class="switch-track"></span>
+        </label>
+      </div>
+    </div>
+    <div class="card">
       <button id="btn-logout" class="btn btn-stop btn-block">LOG OUT</button>
     </div>
   </section>
+
 
   <!-- ================= DRAWER MENU ================= -->
   <div class="drawer-overlay hidden" id="drawer-overlay"></div>

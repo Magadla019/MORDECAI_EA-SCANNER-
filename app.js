@@ -5,13 +5,16 @@
 
 const STORAGE = {
   token: 'mordecai_token',
+  email: 'mordecai_email',
   backendUrl: 'mordecai_backend_url',
   theme: 'mordecai_theme',
-  running: 'mordecai_running'
+  running: 'mordecai_running',
+  hideHero: 'mordecai_hide_hero'
 };
 
 const state = {
   token: localStorage.getItem(STORAGE.token) || null,
+  email: localStorage.getItem(STORAGE.email) || '',
   backendUrl: localStorage.getItem(STORAGE.backendUrl) || '',
   running: localStorage.getItem(STORAGE.running) === 'true',
   authMode: 'login',
@@ -110,7 +113,10 @@ authSubmit.addEventListener('click', async () => {
   try {
     const data = await api(`/api/auth/${state.authMode}`, { method: 'POST', body: JSON.stringify({ email, password }) });
     state.token = data.token;
+    state.email = email;
     localStorage.setItem(STORAGE.token, data.token);
+    localStorage.setItem(STORAGE.email, email);
+    refreshAccountCard();
     showView('dashboard');
     startPolling();
   } catch (e) {
@@ -120,13 +126,32 @@ authSubmit.addEventListener('click', async () => {
 
 function logout() {
   localStorage.removeItem(STORAGE.token);
+  localStorage.removeItem(STORAGE.email);
   state.token = null;
+  state.email = '';
   stopPolling();
   closeDrawer();
+  refreshAccountCard();
+  // Signing out no longer locks you out of the dashboard - it's optional,
+  // so just land back on the account screen instead of a hard gate.
+  document.getElementById('login-back-row').style.display = 'flex';
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-login').classList.add('active');
 }
 document.getElementById('btn-logout').addEventListener('click', logout);
+document.getElementById('btn-account-logout')?.addEventListener('click', logout);
+
+// ---------------- Account card (Settings) — persistent sign-in status ----------------
+function refreshAccountCard() {
+  const signedIn = !!state.token;
+  document.getElementById('account-signed-out').classList.toggle('hidden', signedIn);
+  document.getElementById('account-signed-in').classList.toggle('hidden', !signedIn);
+  if (signedIn) document.getElementById('account-email').textContent = state.email || '—';
+}
+document.getElementById('btn-go-signin')?.addEventListener('click', () => {
+  document.getElementById('login-back-row').style.display = 'flex';
+  showView('login');
+});
 
 // ---------------- theme ----------------
 function applyTheme(theme) {
@@ -518,12 +543,28 @@ function renderResult(r) {
     .map(x => `<div class="scan-step done"><span class="check">✓</span> ${x}</div>`).join('') || '<p class="footer-note">No confluence details returned.</p>';
 }
 
+// ---------------- Appearance: hide hero background toggle ----------------
+const heroToggle = document.getElementById('toggle-hero-bg');
+function applyHeroVisibility(hidden) {
+  document.getElementById('bg-layer')?.classList.toggle('hero-hidden', hidden);
+  if (heroToggle) heroToggle.checked = !hidden;
+}
+heroToggle?.addEventListener('change', () => {
+  localStorage.setItem(STORAGE.hideHero, String(heroToggle.checked));
+  applyHeroVisibility(heroToggle.checked);
+});
+applyHeroVisibility(localStorage.getItem(STORAGE.hideHero) === 'true');
+
+// Pattern Lock is a stubbed, disabled control for now (per product decision) -
+// the checkbox has the `disabled` attribute in index.html so it can't be
+// toggled yet. No handler needed until the feature is actually built.
+
 // ---------------- boot ----------------
-// Registration/login is temporarily bypassed - the app opens straight to the
-// dashboard. Re-enable by restoring the token check below once auth is wired
-// back in. Backend calls that need a token (MT5 status, performance, signals)
-// already fail gracefully and just show offline/empty states without one.
+// Sign-in is optional, not a gate: the dashboard is usable either way, and
+// once you do sign in, the session persists automatically via localStorage -
+// no need to log in again on this device until you explicitly sign out.
 renderEngines(false);
+refreshAccountCard();
 showView('dashboard');
 startPolling();
 setRunning(state.running);
