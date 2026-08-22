@@ -25,7 +25,7 @@ const state = {
 function wireLogos() {
   const src = window.MORDECAI_LOGO_HERO || 'icons/icon-512.png';
   const avatarSrc = window.MORDECAI_LOGO_AVATAR || 'icons/icon-192.png';
-  ['login-avatar', 'hero-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
+  ['login-avatar', 'hero-avatar', 'scan-avatar', 'drawer-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
   ['header-avatar', 'list-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatarSrc; });
   const bg = document.getElementById('bg-layer');
   if (bg) bg.style.backgroundImage = `url(${src})`;
@@ -84,6 +84,7 @@ document.getElementById('open-menu').addEventListener('click', () => {
 });
 function closeDrawer() { drawer.classList.add('hidden'); drawerOverlay.classList.add('hidden'); }
 drawerOverlay.addEventListener('click', closeDrawer);
+document.getElementById('close-menu')?.addEventListener('click', closeDrawer);
 document.getElementById('drawer-logout').addEventListener('click', logout);
 
 // ---------------- auth ----------------
@@ -198,6 +199,10 @@ function setRunning(running) {
 
   const lrStatus = document.getElementById('lr-status');
   if (lrStatus) { lrStatus.textContent = running ? 'RUNNING' : 'STOPPED'; lrStatus.classList.toggle('run-color', running); }
+
+  const drawerStatus = document.getElementById('drawer-status');
+  if (drawerStatus) drawerStatus.innerHTML = `<span class="run-dot" id="drawer-status-dot"></span>${running ? 'RUNNING' : 'NOT RUNNING'}`;
+  drawerStatus?.classList.toggle('running', running);
 
   renderEngines(running);
 }
@@ -443,9 +448,14 @@ document.getElementById('an-file').addEventListener('change', (e) => {
 });
 
 const SCAN_STEPS = [
-  'Scanning market structure', 'Mapping liquidity zones', 'Detecting order blocks',
-  'Detecting FVG', 'Running AI pattern recognition', 'Validating volume & momentum',
-  'Calculating risk/reward', 'Finalizing signal'
+  { label: 'Scanning market structure', icon: '▦' },
+  { label: 'Mapping liquidity zones', icon: '≈' },
+  { label: 'Detecting order blocks', icon: '▢' },
+  { label: 'Detecting FVG', icon: '◇' },
+  { label: 'Running AI pattern recognition', icon: '🧠' },
+  { label: 'Validating volume & momentum', icon: '∿' },
+  { label: 'Calculating risk/reward', icon: '↗' },
+  { label: 'Finalizing signal', icon: '✦' }
 ];
 
 document.getElementById('btn-analyze').addEventListener('click', async () => {
@@ -460,19 +470,30 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   document.getElementById('scan-symbol-label').textContent = symbol;
 
   const stepsEl = document.getElementById('scan-steps');
-  stepsEl.innerHTML = SCAN_STEPS.map(s => `<div class="scan-step" data-step="${s}"><span>○</span> ${s}</div>`).join('');
-  const progress = document.getElementById('scan-progress');
+  stepsEl.innerHTML = SCAN_STEPS.map(s =>
+    `<div class="scan-step"><span class="step-icon">${s.icon}</span>${s.label}</div>`).join('');
+  const segEl = document.getElementById('scan-segments');
+  const segCount = SCAN_STEPS.length;
+  segEl.innerHTML = Array.from({ length: segCount }).map(() => `<div class="seg"></div>`).join('');
+  const segments = segEl.querySelectorAll('.seg');
+  const ringCircle = document.getElementById('scan-ring-circle');
+  const circumference = 2 * Math.PI * 60;
+  ringCircle.style.strokeDasharray = String(circumference);
 
   // Visual step-through while the real API call runs in parallel
   let i = 0;
+  if (stepsEl.children[0]) stepsEl.children[0].classList.add('active');
   const stepTimer = setInterval(() => {
     if (i >= SCAN_STEPS.length) return;
-    const rows = stepsEl.querySelectorAll('.scan-step');
-    rows[i].classList.add('done');
-    rows[i].querySelector('span').textContent = '✓';
-    rows[i].querySelector('span').classList.add('check');
+    stepsEl.children[i].classList.remove('active');
+    stepsEl.children[i].classList.add('done');
+    segments[i].classList.add('filled');
     i++;
-    progress.style.width = `${Math.min(100, (i / SCAN_STEPS.length) * 100)}%`;
+    if (stepsEl.children[i]) stepsEl.children[i].classList.add('active');
+    const pct = Math.min(100, Math.round((i / SCAN_STEPS.length) * 100));
+    document.getElementById('scan-pct').textContent = `${pct}%`;
+    document.getElementById('scan-lock').textContent = `${Math.max(0, (SCAN_STEPS.length - i) * 0.5).toFixed(1)}s LOCK`;
+    ringCircle.style.strokeDashoffset = String(circumference * (1 - pct / 100));
   }, 500);
 
   const formData = new FormData();
@@ -488,7 +509,8 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   try {
     const result = await api('/api/analyze/screenshot', { method: 'POST', body: formData });
     clearInterval(stepTimer);
-    progress.style.width = '100%';
+    document.getElementById('scan-pct').textContent = '100%';
+    ringCircle.style.strokeDashoffset = '0';
     setTimeout(() => {
       scanCard.classList.add('hidden');
       if (result.insufficient_data) {
@@ -508,15 +530,62 @@ document.getElementById('btn-analyze').addEventListener('click', async () => {
   }
 });
 
+// Deterministic decorative waveform seeded from the result itself (not real
+// tick data - purely a visual "diagnostics" flourish, same idea as the
+// reference app's scan animation, not a claim of literal live market data).
+function seededRandom(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return () => (s = (s * 16807) % 2147483647) / 2147483647;
+}
+function renderWaveform(svgEl, seedStr) {
+  let seed = 0;
+  for (let i = 0; i < seedStr.length; i++) seed += seedStr.charCodeAt(i) * (i + 7);
+  const rand = seededRandom(seed || 42);
+  const bars = 46;
+  const barW = 300 / bars;
+  let bars_svg = '';
+  for (let i = 0; i < bars; i++) {
+    const h = 8 + rand() * 46;
+    const x = i * barW + 1;
+    const y = 60 - h;
+    bars_svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(barW - 1.5).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5" fill="var(--accent)" opacity="${(0.45 + rand() * 0.55).toFixed(2)}"/>`;
+  }
+  svgEl.innerHTML = bars_svg;
+}
+
 function renderResult(r) {
-  const ring = document.getElementById('conf-ring');
-  ring.style.setProperty('--pct', r.confidence || 0);
-  document.getElementById('conf-num').textContent = r.confidence ?? '—';
+  renderWaveform(document.getElementById('diag-wave'), `${r.setupId || ''}${r.symbol || ''}${r.confidence || 0}`);
+
+  const conf = r.confidence || 0;
+  [['conf-ring', 'conf-num'], ['conf-ring-lg', 'conf-num-lg']].forEach(([ringId, numId]) => {
+    const ring = document.getElementById(ringId);
+    ring.style.setProperty('--pct', conf);
+    document.getElementById(numId).textContent = conf ?? '—';
+  });
 
   const verdictEl = document.getElementById('result-verdict');
   verdictEl.textContent = r.verdict || 'NO TRADE';
-  verdictEl.className = 'verdict ' + (r.direction === 'buy' ? 'buy' : r.direction === 'sell' ? 'sell' : 'no');
+  const dirClass = r.direction === 'buy' ? 'buy' : r.direction === 'sell' ? 'sell' : 'no';
+  verdictEl.className = 'verdict ' + dirClass;
   document.getElementById('result-rr').textContent = r.risk_reward ? `Risk/Reward 1:${r.risk_reward}` : 'This is analysis, not a guaranteed outcome.';
+
+  const tags = [r.direction ? r.direction.toUpperCase() : null, r.market_structure, r.risk_reward ? `RR ${r.risk_reward}:1` : null].filter(Boolean);
+  document.getElementById('result-tags').innerHTML = tags.map(t => `<span>${t}</span>`).join('');
+
+  const strengthEl = document.getElementById('result-strength');
+  strengthEl.textContent = r.verdict || '—';
+  strengthEl.className = dirClass === 'buy' ? 'pos' : dirClass === 'sell' ? 'neg' : '';
+  const dirBadge = document.getElementById('result-dirbadge');
+  dirBadge.textContent = r.direction ? r.direction.toUpperCase() : '—';
+  dirBadge.className = 'badge ' + (dirClass === 'buy' ? 'pos' : dirClass === 'sell' ? 'neg' : '');
+
+  // Trend/Momentum/Volatility mini-bars are derived from the single confidence
+  // score with slight, deterministic variation - a visual breakdown, not
+  // separately-measured sub-metrics the backend doesn't actually return.
+  document.getElementById('bar-trend').style.width = `${Math.min(100, conf)}%`;
+  document.getElementById('bar-momnt').style.width = `${Math.min(100, Math.max(0, conf - 8))}%`;
+  document.getElementById('bar-vol').style.width = `${Math.min(100, Math.max(0, conf - 20))}%`;
 
   const rows = [
     ['Direction', r.direction?.toUpperCase() || '—'],
@@ -540,11 +609,11 @@ function renderResult(r) {
   }
 
   document.getElementById('result-reasoning').innerHTML = (r.reasoning || [])
-    .map(x => `<div class="scan-step done"><span class="check">✓</span> ${x}</div>`).join('') || '<p class="footer-note">No confluence details returned.</p>';
+    .map(x => `<div class="scan-step done"><span class="step-icon">✓</span>${x}</div>`).join('') || '<p class="footer-note">No confluence details returned.</p>';
 }
 
 // ---------------- Appearance: hide hero background toggle ----------------
-const heroToggle = document.getElementById('toggle-hero-bg');
+const heroToggle = document.getElementById('toggle-hero-bg-drawer');
 function applyHeroVisibility(hidden) {
   document.getElementById('bg-layer')?.classList.toggle('hero-hidden', hidden);
   if (heroToggle) heroToggle.checked = !hidden;
