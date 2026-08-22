@@ -1,7 +1,6 @@
-const CACHE = 'mordecai-shell-v4';
+const CACHE = 'mordecai-shell-v5';
 const SHELL = ['./', './index.html', './styles.css', './app.js', './logo-data.js', './manifest.json',
-               './icons/icon-192.png', './icons/icon-512.png',
-               './icons/icon-192-maskable.png', './icons/icon-512-maskable.png'];
+               './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
