@@ -25,7 +25,7 @@ const state = {
 function wireLogos() {
   const src = window.MORDECAI_LOGO_HERO || 'icons/icon-512.png';
   const avatarSrc = window.MORDECAI_LOGO_AVATAR || 'icons/icon-192.png';
-  ['login-avatar', 'hero-avatar', 'scan-avatar', 'drawer-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
+  ['login-avatar', 'hero-avatar', 'scan-avatar', 'drawer-avatar', 'status-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
   ['header-avatar', 'list-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatarSrc; });
   const bg = document.getElementById('bg-layer');
   if (bg) bg.style.backgroundImage = `url(${src})`;
@@ -610,6 +610,55 @@ function renderResult(r) {
 
   document.getElementById('result-reasoning').innerHTML = (r.reasoning || [])
     .map(x => `<div class="scan-step done"><span class="step-icon">✓</span>${x}</div>`).join('') || '<p class="footer-note">No confluence details returned.</p>';
+}
+
+// ---------------- Status panel (in-app only - never draws over other apps) ----------------
+const statusOverlay = document.getElementById('status-overlay');
+const statusPanel = document.getElementById('status-panel');
+
+function openStatusPanel() {
+  statusOverlay.classList.remove('hidden');
+  statusPanel.classList.remove('hidden');
+  refreshStatusPanel();
+}
+function closeStatusPanel() {
+  statusOverlay.classList.add('hidden');
+  statusPanel.classList.add('hidden');
+}
+document.getElementById('run-state').addEventListener('click', openStatusPanel);
+statusOverlay.addEventListener('click', closeStatusPanel);
+document.getElementById('status-close').addEventListener('click', closeStatusPanel);
+
+async function refreshStatusPanel() {
+  document.getElementById('status-owner').textContent = state.email || 'Guest';
+
+  const online = navigator.onLine;
+  let mt5 = null;
+  try { mt5 = await api('/api/sync/status'); } catch { mt5 = null; }
+  const mt5Connected = !!mt5?.connected;
+  const botActive = !!state.running;
+  const symbols = mt5?.openPositions?.length
+    ? [...new Set(mt5.openPositions.map(p => p.symbol))].join(', ')
+    : (mt5Connected ? 'No open positions' : '—');
+
+  const checks = [
+    { label: 'CONNECTED ACCOUNT', ok: mt5Connected },
+    { label: 'INTERNET', ok: online },
+    { label: symbols, ok: mt5Connected },
+    { label: 'BOT ACTIVE', ok: botActive }
+  ];
+
+  document.getElementById('status-checklist').innerHTML = checks.map(c => `
+    <div class="status-check-row ${c.ok ? '' : 'bad'}">
+      <span class="status-check-icon">${c.ok ? '✓' : '✕'}</span>${c.label}
+    </div>`).join('');
+
+  const allOk = checks.every(c => c.ok);
+  const overallEl = document.getElementById('status-overall');
+  overallEl.textContent = allOk ? 'NORMAL' : 'ATTENTION NEEDED';
+  overallEl.classList.toggle('attention', !allOk);
+
+  document.getElementById('status-mini-dot').className = 'status-dot-mini ' + (allOk ? 'ok' : 'bad');
 }
 
 // ---------------- Appearance: hide hero background toggle ----------------

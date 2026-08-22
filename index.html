@@ -59,7 +59,7 @@
       <div class="ring"><img id="hero-avatar" alt="MORDECAI"></div>
       <div class="hero-name">MORDECAI<span>_EA</span> SCANNER</div>
       <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
-      <div class="run-state stopped" id="run-state"><span class="run-dot"></span>NOT RUNNING</div>
+      <button class="run-state stopped" id="run-state"><span class="run-dot"></span>NOT RUNNING</button>
     </div>
 
     <div class="icon-btn-block">
@@ -394,6 +394,22 @@
     </div>
 
     <button class="drawer-item" id="drawer-logout" style="margin-top:14px;"><span class="di-icon" style="background:rgba(239,68,68,0.15);">🚪</span><span class="di-label">Logout</span></button>
+  </div>
+
+  <!-- ================= STATUS PANEL (in-app only, never draws over other apps) ================= -->
+  <div class="status-overlay hidden" id="status-overlay"></div>
+  <div class="status-panel hidden" id="status-panel">
+    <div class="status-card">
+      <img id="status-avatar" class="status-avatar" alt="">
+      <div class="status-owner" id="status-owner">Guest</div>
+      <div class="status-botname">MORDECAI_EA SCANNER</div>
+      <div class="status-actions">
+        <div class="status-action"><span class="status-dot-mini" id="status-mini-dot"></span>STATUS</div>
+        <button class="status-action" id="status-close">✕ CLOSE</button>
+      </div>
+    </div>
+    <div class="status-overall" id="status-overall">NORMAL</div>
+    <div class="status-checklist" id="status-checklist"></div>
   </div>
 
 </div>
