@@ -155,10 +155,16 @@ document.getElementById('btn-go-signin')?.addEventListener('click', () => {
 });
 
 // ---------------- theme ----------------
+const THEME_CYCLE = ['red', 'purple', 'blue', 'green', 'cyan', 'orange'];
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.theme === theme));
   localStorage.setItem(STORAGE.theme, theme);
+}
+function cycleTheme() {
+  const current = localStorage.getItem(STORAGE.theme) || 'red';
+  const next = THEME_CYCLE[(THEME_CYCLE.indexOf(current) + 1) % THEME_CYCLE.length];
+  applyTheme(next);
 }
 document.querySelectorAll('.swatch').forEach(s => s.addEventListener('click', () => applyTheme(s.dataset.theme)));
 applyTheme(localStorage.getItem(STORAGE.theme) || 'red');
@@ -626,6 +632,23 @@ function closeStatusPanel() {
   statusPanel.classList.add('hidden');
 }
 document.getElementById('run-state').addEventListener('click', openStatusPanel);
+
+// Header pill: single tap toggles the status panel, double tap cycles the
+// theme color. A short timer disambiguates the two - see comment below.
+let headerPillClickTimer = null;
+document.querySelector('.header-pill').addEventListener('click', () => {
+  if (headerPillClickTimer) {
+    clearTimeout(headerPillClickTimer);
+    headerPillClickTimer = null;
+    cycleTheme();
+    return;
+  }
+  headerPillClickTimer = setTimeout(() => {
+    headerPillClickTimer = null;
+    if (statusPanel.classList.contains('hidden')) openStatusPanel();
+    else closeStatusPanel();
+  }, 260);
+});
 statusOverlay.addEventListener('click', closeStatusPanel);
 document.getElementById('status-close').addEventListener('click', closeStatusPanel);
 
@@ -642,15 +665,15 @@ async function refreshStatusPanel() {
     : (mt5Connected ? 'No open positions' : '—');
 
   const checks = [
-    { label: 'CONNECTED ACCOUNT', ok: mt5Connected },
-    { label: 'INTERNET', ok: online },
-    { label: symbols, ok: mt5Connected },
-    { label: 'BOT ACTIVE', ok: botActive }
+    { label: 'CONNECTED ACCOUNT', ok: mt5Connected, icon: '👤' },
+    { label: 'INTERNET', ok: online, icon: online ? '✓' : '✕' },
+    { label: symbols, ok: mt5Connected, icon: mt5Connected ? '✓' : '✕' },
+    { label: 'BOT ACTIVE', ok: botActive, icon: botActive ? '✓' : '✕' }
   ];
 
   document.getElementById('status-checklist').innerHTML = checks.map(c => `
     <div class="status-check-row ${c.ok ? '' : 'bad'}">
-      <span class="status-check-icon">${c.ok ? '✓' : '✕'}</span>${c.label}
+      <span class="status-check-icon">${c.icon}</span>${c.label}
     </div>`).join('');
 
   const allOk = checks.every(c => c.ok);
