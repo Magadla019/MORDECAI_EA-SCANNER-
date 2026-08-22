@@ -631,7 +631,8 @@ function closeStatusPanel() {
   statusOverlay.classList.add('hidden');
   statusPanel.classList.add('hidden');
 }
-document.getElementById('run-state').addEventListener('click', openStatusPanel);
+// Status panel opens from the header pill only (see below) - not from the
+// run-state bar anymore.
 
 // Header pill: single tap toggles the status panel, double tap cycles the
 // theme color. A short timer disambiguates the two - see comment below.
@@ -688,17 +689,40 @@ async function refreshStatusPanel() {
 const heroToggle = document.getElementById('toggle-hero-bg-drawer');
 function applyHeroVisibility(hidden) {
   document.getElementById('bg-layer')?.classList.toggle('hero-hidden', hidden);
-  if (heroToggle) heroToggle.checked = !hidden;
 }
 heroToggle?.addEventListener('change', () => {
-  localStorage.setItem(STORAGE.hideHero, String(heroToggle.checked));
-  applyHeroVisibility(heroToggle.checked);
+  const hidden = heroToggle.checked;
+  localStorage.setItem(STORAGE.hideHero, String(hidden));
+  applyHeroVisibility(hidden);
 });
-applyHeroVisibility(localStorage.getItem(STORAGE.hideHero) === 'true');
+{
+  const initialHidden = localStorage.getItem(STORAGE.hideHero) === 'true';
+  if (heroToggle) heroToggle.checked = initialHidden;
+  applyHeroVisibility(initialHidden);
+}
 
-// Pattern Lock is a stubbed, disabled control for now (per product decision) -
-// the checkbox has the `disabled` attribute in index.html so it can't be
-// toggled yet. No handler needed until the feature is actually built.
+// Pattern Lock is now a working preference toggle - it saves the user's
+// choice, but does NOT enforce an actual lock screen yet (that's a separate,
+// bigger feature: draw-pattern capture, storage, and a lock gate on launch).
+// The note text makes that honest instead of implying it's fully wired up.
+const patternToggle = document.getElementById('toggle-pattern-lock');
+const patternNote = document.getElementById('pattern-lock-note');
+const patternSetupNote = document.getElementById('pattern-lock-setup');
+function applyPatternLockUI(on) {
+  patternNote.textContent = on
+    ? 'On — saved as your preference.'
+    : 'Off — the app opens straight in, no pattern needed.';
+  patternSetupNote.style.display = on ? 'block' : 'none';
+}
+patternToggle?.addEventListener('change', () => {
+  localStorage.setItem('mordecai_pattern_lock_pref', String(patternToggle.checked));
+  applyPatternLockUI(patternToggle.checked);
+});
+{
+  const savedPatternPref = localStorage.getItem('mordecai_pattern_lock_pref') === 'true';
+  if (patternToggle) patternToggle.checked = savedPatternPref;
+  applyPatternLockUI(savedPatternPref);
+}
 
 // ---------------- boot ----------------
 // Sign-in is optional, not a gate: the dashboard is usable either way, and

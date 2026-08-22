@@ -328,13 +328,14 @@
       <div class="lock-row">
         <div>
           <div class="lr-title" style="font-size:13px;">Pattern Lock</div>
-          <div class="footer-note" style="text-align:left;margin:2px 0 0;">Unlock with a swipe pattern instead of your password, like WhatsApp. Coming soon — disabled for now.</div>
+          <div class="footer-note" style="text-align:left;margin:2px 0 0;" id="pattern-lock-note">Off — the app opens straight in, no pattern needed.</div>
         </div>
         <label class="switch">
-          <input type="checkbox" id="toggle-pattern-lock" disabled>
+          <input type="checkbox" id="toggle-pattern-lock">
           <span class="switch-track"></span>
         </label>
       </div>
+      <p class="footer-note" id="pattern-lock-setup" style="display:none;">Saved as ON. Heads up: the actual draw-a-pattern lock screen isn't built yet, so this switch doesn't lock anything yet — it just remembers that you want it once it's ready.</p>
     </div>
 
     <div class="card">
@@ -416,9 +417,10 @@
         <div class="status-action"><span class="status-dot-mini" id="status-mini-dot"></span>STATUS</div>
         <button class="status-action" id="status-close">✕ CLOSE</button>
       </div>
+      <div class="status-divider"></div>
+      <div class="status-overall" id="status-overall">NORMAL</div>
+      <div class="status-checklist" id="status-checklist"></div>
     </div>
-    <div class="status-overall" id="status-overall">NORMAL</div>
-    <div class="status-checklist" id="status-checklist"></div>
   </div>
 
 </div>

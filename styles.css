@@ -251,20 +251,21 @@ input,select{font-family:inherit; color:var(--text); background:var(--glass); bo
 .drawer-section-label{ font-size:10px; letter-spacing:2px; color:var(--text-dim); font-weight:700; padding:14px 22px 4px; }
 
 /* ---------- Status panel (in-app only - never a system overlay) ---------- */
-.status-overlay{ position:fixed; inset:0; background:rgba(2,3,5,0.93); backdrop-filter:blur(6px); z-index:70; }
-.status-panel{ position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:80; width:88%; max-width:340px; }
-.status-card{ background:var(--bg-elevated); border:1px solid var(--glass-border); border-radius:20px; padding:20px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.6); }
+.status-overlay{ position:fixed; inset:0; background:rgba(2,3,5,0.35); z-index:70; }
+.status-panel{ position:fixed; top:22%; left:50%; transform:translateX(-50%); z-index:80; width:88%; max-width:340px; }
+.status-card{ background:#05070a; border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:20px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.8); }
 .status-avatar{ width:56px; height:56px; border-radius:50%; object-fit:cover; border:2px solid var(--accent); box-shadow:0 0 16px var(--accent-glow); }
 .status-owner{ font-size:12px; color:var(--text-dim); margin-top:8px; letter-spacing:0.5px; }
 .status-botname{ font-size:15px; font-weight:800; letter-spacing:1px; margin-top:2px; }
-.status-actions{ display:flex; justify-content:space-around; margin-top:16px; padding-top:14px; border-top:1px solid var(--glass-border); }
+.status-actions{ display:flex; justify-content:space-around; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1); }
 .status-action{ display:flex; align-items:center; gap:6px; font-size:11px; letter-spacing:1px; font-weight:700; color:var(--text-dim); }
 .status-dot-mini{ width:8px; height:8px; border-radius:50%; background:var(--text-dim); }
 .status-dot-mini.ok{ background:var(--green); box-shadow:0 0 6px var(--green); }
 .status-dot-mini.bad{ background:#ef4444; box-shadow:0 0 6px #ef4444; }
-.status-overall{ text-align:center; font-size:16px; font-weight:800; letter-spacing:2px; margin:18px 0 14px; color:var(--green); }
+.status-divider{ height:1px; background:rgba(255,255,255,0.08); margin:16px -20px 0; }
+.status-overall{ text-align:center; font-size:16px; font-weight:800; letter-spacing:2px; margin:16px 0 14px; color:var(--green); }
 .status-overall.attention{ color:#ef4444; }
-.status-checklist{ display:flex; flex-direction:column; gap:14px; }
+.status-checklist{ display:flex; flex-direction:column; gap:14px; padding-bottom:2px; }
 .status-check-row{ display:flex; align-items:center; justify-content:center; gap:10px; font-size:13px; font-weight:600; letter-spacing:0.5px; color:var(--green); }
 .status-check-row.bad{ color:#ef4444; }
 .status-check-icon{ width:18px; height:18px; border-radius:50%; border:1.5px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; }
