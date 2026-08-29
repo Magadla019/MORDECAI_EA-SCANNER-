@@ -211,6 +211,9 @@ function setRunning(running) {
   if (drawerStatus) drawerStatus.innerHTML = `<span class="run-dot" id="drawer-status-dot"></span>${running ? 'RUNNING' : 'NOT RUNNING'}`;
   drawerStatus?.classList.toggle('running', running);
 
+  // Bottom tab bar (Home / AI Scanner / MetaTrader) only shows while the scanner is running.
+  document.getElementById('run-tabbar')?.classList.toggle('visible', running);
+
   renderEngines(running);
 }
 
