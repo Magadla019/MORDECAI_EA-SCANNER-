@@ -226,6 +226,12 @@ document.getElementById('btn-toggle-run').addEventListener('click', async () => 
   }
 });
 
+// ---------------- Support (WhatsApp) — fixed floating button, same on every screen ----------------
+document.getElementById('support-fab')?.addEventListener('click', () => {
+  // 060 485 3055, South Africa (+27), leading 0 dropped for the international wa.me format
+  window.open('https://wa.me/27604853055', '_blank');
+});
+
 document.getElementById('btn-reset').addEventListener('click', () => {
   if (confirm('Reset the local session? This stops the scanner but does not delete your synced MT5 history or performance data.')) {
     setRunning(false);
