@@ -62,6 +62,7 @@ function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`view-${name}`).classList.add('active');
   closeDrawer();
+  document.getElementById('mt5-dropdown')?.classList.add('hidden');
   if (name === 'live') refreshLive();
   if (name === 'performance') refreshPerformance();
   if (name === 'signals') refreshSignals();
@@ -155,7 +156,7 @@ document.getElementById('btn-go-signin')?.addEventListener('click', () => {
 });
 
 // ---------------- theme ----------------
-const THEME_CYCLE = ['red', 'blue', 'purple', 'cyan', 'pink', 'orange', 'green', 'teal', 'violet', 'silver'];
+const THEME_CYCLE = ['red', 'purple', 'blue', 'green', 'cyan', 'orange'];
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.theme === theme));
@@ -183,7 +184,6 @@ const ENGINES = ['MARKET STRUCTURE','LIQUIDITY ENGINE','ORDER BLOCK ENGINE','FVG
                   'EMA FILTER','ATR ENGINE','SESSION ENGINE','NEWS ENGINE','RISK ENGINE'];
 
 function renderEngines(active) {
-  if (!engineList) return;
   engineList.innerHTML = ENGINES.map(name =>
     `<div class="engine"><span>${name}</span><span class="state ${active ? 'active' : 'inactive'}">${active ? 'ACTIVE' : 'INACTIVE'}</span></div>`
   ).join('');
@@ -232,25 +232,51 @@ document.getElementById('btn-reset').addEventListener('click', () => {
   }
 });
 
+// ---------------- MT5 quick-status dropdown (from header pill) ----------------
+const mt5Dropdown = document.getElementById('mt5-dropdown');
+document.getElementById('mt5-header-pill').addEventListener('click', async (e) => {
+  e.stopPropagation();
+  const isHidden = mt5Dropdown.classList.contains('hidden');
+  if (isHidden) {
+    mt5Dropdown.classList.remove('hidden');
+    const s = await refreshMt5Status().catch(() => null);
+    const connEl = document.getElementById('mt5-dd-connected');
+    connEl.textContent = s?.connected ? 'CONNECTED' : 'DISCONNECTED';
+    connEl.className = 'mt5-dd-val ' + (s?.connected ? 'ok' : 'bad');
+
+    const signedEl = document.getElementById('mt5-dd-signedin');
+    signedEl.textContent = state.token ? 'YES' : 'NO';
+    signedEl.className = 'mt5-dd-val ' + (state.token ? 'ok' : 'bad');
+
+    const healthEl = document.getElementById('mt5-dd-health');
+    const healthy = !!state.backendUrl && (s !== null);
+    healthEl.textContent = healthy ? 'OK' : 'CHECK BACKEND';
+    healthEl.className = 'mt5-dd-val ' + (healthy ? 'ok' : 'bad');
+  } else {
+    mt5Dropdown.classList.add('hidden');
+  }
+});
+document.addEventListener('click', (e) => {
+  if (!mt5Dropdown.classList.contains('hidden') && !mt5Dropdown.contains(e.target)) {
+    mt5Dropdown.classList.add('hidden');
+  }
+});
+mt5Dropdown.addEventListener('click', (e) => e.stopPropagation());
+
 // ---------------- MT5 status polling ----------------
 async function refreshMt5Status() {
   if (!state.backendUrl) return null;
   try {
     const s = await api('/api/sync/status');
-    const statMt5 = document.getElementById('stat-mt5');
-    const statCloud = document.getElementById('stat-cloud');
-    const statLast = document.getElementById('stat-lastsync');
-    const statSymbol = document.getElementById('stat-symbol');
-    if (statMt5) statMt5.textContent = s.connected ? 'CONNECTED' : 'DISCONNECTED';
-    if (statCloud) statCloud.textContent = 'CONNECTED';
-    if (statLast) statLast.textContent = fmtTime(s.lastSync);
-    if (statSymbol && s.openPositions?.[0]) statSymbol.textContent = s.openPositions[0].symbol;
+    document.getElementById('stat-mt5').textContent = s.connected ? 'CONNECTED' : 'DISCONNECTED';
+    document.getElementById('stat-cloud').textContent = 'CONNECTED';
+    document.getElementById('stat-lastsync').textContent = fmtTime(s.lastSync);
+    if (s.openPositions?.[0]) document.getElementById('stat-symbol').textContent = s.openPositions[0].symbol;
     const pillDot = document.getElementById('mt5-pill-dot');
     if (pillDot) pillDot.className = 'mt5-pill-dot ' + (s.connected ? 'ok' : 'bad');
     return s;
   } catch (e) {
-    const statCloud = document.getElementById('stat-cloud');
-    if (statCloud) statCloud.textContent = 'CLOUD OFFLINE';
+    document.getElementById('stat-cloud').textContent = 'CLOUD OFFLINE';
     const pillDot = document.getElementById('mt5-pill-dot');
     if (pillDot) pillDot.className = 'mt5-pill-dot bad';
     return null;
@@ -259,8 +285,9 @@ async function refreshMt5Status() {
 
 function startPolling() {
   refreshMt5Status();
+  refreshDashboardExtras();
   stopPolling();
-  state.pollTimer = setInterval(() => { refreshMt5Status(); }, 8000);
+  state.pollTimer = setInterval(() => { refreshMt5Status(); refreshDashboardExtras(); }, 8000);
 }
 function stopPolling() { if (state.pollTimer) clearInterval(state.pollTimer); }
 
@@ -314,9 +341,11 @@ document.querySelectorAll('[data-mt5tab]').forEach(btn => {
 });
 
 document.getElementById('btn-link-mt5').addEventListener('click', async () => {
+  const broker = document.getElementById('link-broker').value.trim();
   const login = document.getElementById('link-login').value.trim();
   const investorPassword = document.getElementById('link-password').value;
   const server = document.getElementById('link-server').value.trim();
+  const accountType = document.getElementById('link-account-type').value;
   const errEl = document.getElementById('link-error');
   errEl.textContent = '';
 
@@ -325,10 +354,11 @@ document.getElementById('btn-link-mt5').addEventListener('click', async () => {
     return;
   }
 
+  const label = `${broker || 'MORDECAI'}-${accountType}-${login}`;
   const btn = document.getElementById('btn-link-mt5');
   btn.textContent = 'LINKING…';
   try {
-    await api('/api/mt5/link', { method: 'POST', body: JSON.stringify({ login, investorPassword, server }) });
+    await api('/api/mt5/link', { method: 'POST', body: JSON.stringify({ login, investorPassword, server, label, broker, accountType }) });
     document.getElementById('link-password').value = '';
     await refreshMt5View();
   } catch (e) {
@@ -764,18 +794,18 @@ const installBanner = document.getElementById('install-banner');
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  installBanner?.classList.remove('hidden');
+  installBanner.classList.remove('hidden');
 });
 
-installBanner?.addEventListener('click', async () => {
+installBanner.addEventListener('click', async () => {
   if (!deferredInstallPrompt) return;
-  installBanner?.classList.add('hidden');
+  installBanner.classList.add('hidden');
   deferredInstallPrompt.prompt();
   await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
 });
 
 window.addEventListener('appinstalled', () => {
-  installBanner?.classList.add('hidden');
+  installBanner.classList.add('hidden');
   deferredInstallPrompt = null;
 });
