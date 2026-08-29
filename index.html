@@ -51,11 +51,6 @@
     </div>
     <div class="header-spacer"></div>
 
-    <button id="install-banner" class="install-banner hidden">
-      <span>📲 Install MORDECAI_EA SCANNER as an app</span>
-      <span class="install-go">Install</span>
-    </button>
-
     <div class="hero-viewport">
       <div class="hero">
         <div class="ring"><img id="hero-avatar" alt="MORDECAI"></div>
@@ -87,44 +82,6 @@
       </div>
     </div>
 
-    <div class="list-rows" style="margin-top:14px;">
-      <button class="list-row" data-view="mt5">
-        <img class="lr-thumb" id="list-avatar" alt="">
-        <div class="lr-mid"><div class="lr-title">MORDECAI_EA SCANNER</div><div class="lr-sub run-color" id="lr-status">RUNNING</div></div>
-        <span class="lr-chevron">›</span>
-      </button>
-      <button class="list-row" data-view="live">
-        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="9" width="3" height="10" fill="#22e07a"/><rect x="8" y="4" width="3" height="15" fill="#ff2b3d"/><rect x="13" y="12" width="3" height="7" fill="#22e07a"/><rect x="18" y="2" width="3" height="17" fill="#ff2b3d"/></svg></div>
-        <div class="lr-mid"><div class="lr-title" id="lr-live-symbol">XAUUSD · M15</div><div class="lr-sub">Live Trading</div></div>
-        <svg class="lr-spark" id="lr-spark" viewBox="0 0 80 28" preserveAspectRatio="none"></svg>
-        <span class="lr-chevron">›</span>
-      </button>
-      <button class="list-row" data-view="performance">
-        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><circle cx="12" cy="12" r="9" fill="none" stroke="#ff2b3d" stroke-width="1.6"/><circle cx="12" cy="12" r="5" fill="none" stroke="#ff2b3d" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="#ff2b3d"/></svg></div>
-        <div class="lr-mid"><div class="lr-title">PERFORMANCE</div><div class="lr-sub">Today's P/L</div></div>
-        <div class="lr-value mono" id="lr-pl">—</div>
-        <span class="lr-chevron">›</span>
-      </button>
-      <button class="list-row" data-view="analytics">
-        <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="12" width="4" height="9" rx="1" fill="#3ba9ff"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#22e07a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ff2b3d"/></svg></div>
-        <div class="lr-mid"><div class="lr-title">CHART SCANNER</div><div class="lr-sub">AI-powered market analysis</div></div>
-        <span class="lr-bubble">💬</span>
-      </button>
-    </div>
-
-    <div class="card" style="margin-top:16px;">
-      <h3>System Status</h3>
-      <div class="row"><span class="label">MT5</span><span class="val" id="stat-mt5">DISCONNECTED</span></div>
-      <div class="row"><span class="label">Cloud</span><span class="val" id="stat-cloud">CHECKING…</span></div>
-      <div class="row"><span class="label">Symbol</span><span class="val" id="stat-symbol">—</span></div>
-      <div class="row"><span class="label">Last Sync</span><span class="val mono" id="stat-lastsync">—</span></div>
-    </div>
-
-    <div class="card" id="engines-card">
-      <h3>Strategy Engine Status</h3>
-      <div id="engine-list"></div>
-    </div>
-  </section>
 
 
   <!-- ================= MT5 CONNECTION VIEW ================= -->
@@ -370,9 +327,9 @@
 
     <div class="drawer-list">
       <button class="drawer-item drawer-item-active" data-view="dashboard"><span class="di-icon" style="background:rgba(255,43,61,0.18);">🏠</span><span class="di-label">Home</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="analytics"><span class="di-icon" style="background:rgba(162,59,255,0.18);">📊</span><span class="di-label">Chart Scanner</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="mt5"><span class="di-icon" style="background:rgba(162,59,255,0.18);">🔌</span><span class="di-label">MetaTrader</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="settings"><span class="di-icon" style="background:rgba(162,59,255,0.18);">⚙️</span><span class="di-label">Settings</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="analytics"><span class="di-icon" style="background:rgba(59,169,255,0.16);">📊</span><span class="di-label">Chart Scanner</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="mt5"><span class="di-icon" style="background:rgba(34,197,140,0.15);">🔌</span><span class="di-label">MetaTrader</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="settings"><span class="di-icon" style="background:rgba(255,255,255,0.09);">⚙️</span><span class="di-label">Settings</span><span class="di-chev">›</span></button>
     </div>
 
     <div class="drawer-section-label">APPEARANCE</div>
@@ -385,21 +342,24 @@
       <div class="drawer-item drawer-item-static" style="flex-direction:column; align-items:flex-start; gap:10px;">
         <div style="display:flex;align-items:center;gap:12px;"><span class="di-icon" style="background:rgba(162,59,255,0.15);">💧</span><span class="di-label">Glow Color</span></div>
         <div class="theme-swatches" style="padding-left:52px;">
-          <button class="swatch" data-theme="red" style="background:#ff2b3d;"></button>
-          <button class="swatch" data-theme="blue" style="background:#2b7dff;"></button>
-          <button class="swatch" data-theme="purple" style="background:#a23bff;"></button>
-          <button class="swatch" data-theme="green" style="background:#22e07a;"></button>
-          <button class="swatch" data-theme="cyan" style="background:#22d3ee;"></button>
-          <button class="swatch" data-theme="orange" style="background:#ff8a2b;"></button>
-          <button class="swatch" data-theme="pink" style="background:#ff2b8f;"></button>
-          <button class="swatch" data-theme="grape" style="background:#7c3aed;"></button>
-          <button class="swatch" data-theme="magenta" style="background:#e91e8c;"></button>
-          <button class="swatch" data-theme="sky" style="background:#0ea5e9;"></button>
-          <button class="swatch" data-theme="teal" style="background:#14b8a6;"></button>
-          <button class="swatch" data-theme="lime" style="background:#84cc16;"></button>
-          <button class="swatch" data-theme="yellow" style="background:#eab308;"></button>
-          <button class="swatch" data-theme="indigo" style="background:#6d28d9;"></button>
-          <button class="swatch" data-theme="silver" style="background:#e5e7eb;"></button>
+          <button class="swatch" data-theme="blue" style="background:#2b7dff;" aria-label="blue"></button>
+          <button class="swatch" data-theme="indigo" style="background:#6d28d9;" aria-label="indigo"></button>
+          <button class="swatch" data-theme="cyan" style="background:#22d3ee;" aria-label="cyan"></button>
+          <button class="swatch" data-theme="pink" style="background:#ff2b8f;" aria-label="pink"></button>
+          <button class="swatch" data-theme="orange" style="background:#ff8a2b;" aria-label="orange"></button>
+          <button class="swatch" data-theme="yellow" style="background:#eab308;" aria-label="yellow"></button>
+          <button class="swatch" data-theme="purple" style="background:#a23bff;" aria-label="purple"></button>
+          <button class="swatch" data-theme="red" style="background:#ff2b3d;" aria-label="red"></button>
+          <button class="swatch" data-theme="sky" style="background:#0ea5e9;" aria-label="sky"></button>
+          <button class="swatch" data-theme="teal" style="background:#14b8a6;" aria-label="teal"></button>
+          <button class="swatch" data-theme="green" style="background:#22e07a;" aria-label="green"></button>
+          <button class="swatch" data-theme="lime" style="background:#84cc16;" aria-label="lime"></button>
+          <button class="swatch" data-theme="grape" style="background:#7c3aed;" aria-label="grape"></button>
+          <button class="swatch" data-theme="magenta" style="background:#e91e8c;" aria-label="magenta"></button>
+          <button class="swatch" data-theme="violet" style="background:#8b5cf6;" aria-label="violet"></button>
+          <button class="swatch" data-theme="rose" style="background:#fb7185;" aria-label="rose"></button>
+          <button class="swatch" data-theme="coral" style="background:#ff6b4a;" aria-label="coral"></button>
+          <button class="swatch" data-theme="silver" style="background:#e5e7eb;" aria-label="silver"></button>
         </div>
       </div>
     </div>

@@ -155,7 +155,7 @@ document.getElementById('btn-go-signin')?.addEventListener('click', () => {
 });
 
 // ---------------- theme ----------------
-const THEME_CYCLE = ['red', 'purple', 'blue', 'green', 'cyan', 'orange'];
+const THEME_CYCLE = ['red', 'blue', 'purple', 'cyan', 'pink', 'orange', 'green', 'teal', 'violet', 'silver'];
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   document.querySelectorAll('.swatch').forEach(s => s.classList.toggle('selected', s.dataset.theme === theme));
@@ -183,6 +183,7 @@ const ENGINES = ['MARKET STRUCTURE','LIQUIDITY ENGINE','ORDER BLOCK ENGINE','FVG
                   'EMA FILTER','ATR ENGINE','SESSION ENGINE','NEWS ENGINE','RISK ENGINE'];
 
 function renderEngines(active) {
+  if (!engineList) return;
   engineList.innerHTML = ENGINES.map(name =>
     `<div class="engine"><span>${name}</span><span class="state ${active ? 'active' : 'inactive'}">${active ? 'ACTIVE' : 'INACTIVE'}</span></div>`
   ).join('');
@@ -236,15 +237,20 @@ async function refreshMt5Status() {
   if (!state.backendUrl) return null;
   try {
     const s = await api('/api/sync/status');
-    document.getElementById('stat-mt5').textContent = s.connected ? 'CONNECTED' : 'DISCONNECTED';
-    document.getElementById('stat-cloud').textContent = 'CONNECTED';
-    document.getElementById('stat-lastsync').textContent = fmtTime(s.lastSync);
-    if (s.openPositions?.[0]) document.getElementById('stat-symbol').textContent = s.openPositions[0].symbol;
+    const statMt5 = document.getElementById('stat-mt5');
+    const statCloud = document.getElementById('stat-cloud');
+    const statLast = document.getElementById('stat-lastsync');
+    const statSymbol = document.getElementById('stat-symbol');
+    if (statMt5) statMt5.textContent = s.connected ? 'CONNECTED' : 'DISCONNECTED';
+    if (statCloud) statCloud.textContent = 'CONNECTED';
+    if (statLast) statLast.textContent = fmtTime(s.lastSync);
+    if (statSymbol && s.openPositions?.[0]) statSymbol.textContent = s.openPositions[0].symbol;
     const pillDot = document.getElementById('mt5-pill-dot');
     if (pillDot) pillDot.className = 'mt5-pill-dot ' + (s.connected ? 'ok' : 'bad');
     return s;
   } catch (e) {
-    document.getElementById('stat-cloud').textContent = 'CLOUD OFFLINE';
+    const statCloud = document.getElementById('stat-cloud');
+    if (statCloud) statCloud.textContent = 'CLOUD OFFLINE';
     const pillDot = document.getElementById('mt5-pill-dot');
     if (pillDot) pillDot.className = 'mt5-pill-dot bad';
     return null;
@@ -253,9 +259,8 @@ async function refreshMt5Status() {
 
 function startPolling() {
   refreshMt5Status();
-  refreshDashboardExtras();
   stopPolling();
-  state.pollTimer = setInterval(() => { refreshMt5Status(); refreshDashboardExtras(); }, 8000);
+  state.pollTimer = setInterval(() => { refreshMt5Status(); }, 8000);
 }
 function stopPolling() { if (state.pollTimer) clearInterval(state.pollTimer); }
 
@@ -759,18 +764,18 @@ const installBanner = document.getElementById('install-banner');
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  installBanner.classList.remove('hidden');
+  installBanner?.classList.remove('hidden');
 });
 
-installBanner.addEventListener('click', async () => {
+installBanner?.addEventListener('click', async () => {
   if (!deferredInstallPrompt) return;
-  installBanner.classList.add('hidden');
+  installBanner?.classList.add('hidden');
   deferredInstallPrompt.prompt();
   await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
 });
 
 window.addEventListener('appinstalled', () => {
-  installBanner.classList.add('hidden');
+  installBanner?.classList.add('hidden');
   deferredInstallPrompt = null;
 });
