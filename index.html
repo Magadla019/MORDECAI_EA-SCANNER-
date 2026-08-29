@@ -47,6 +47,7 @@
         <img id="header-avatar" alt="MORDECAI">
         <div><div class="hp-title">MORDECAI<span>_EA</span> SCANNER</div><div class="hp-sub">SMART MONEY CONCEPTS</div></div>
       </div>
+      <button class="mt5-pill" id="mt5-header-pill" data-view="mt5"><span class="mt5-pill-dot" id="mt5-pill-dot"></span>MT5 <svg viewBox="0 0 24 24" width="12" height="12"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="header-spacer"></div>
 
@@ -55,34 +56,38 @@
       <span class="install-go">Install</span>
     </button>
 
-    <div class="hero">
-      <div class="ring"><img id="hero-avatar" alt="MORDECAI"></div>
-      <div class="hero-name">MORDECAI<span>_EA</span> SCANNER</div>
-      <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
-      <button class="run-state stopped" id="run-state"><span class="run-dot"></span>NOT RUNNING</button>
-    </div>
+    <div class="hero-viewport">
+      <div class="hero">
+        <div class="ring"><img id="hero-avatar" alt="MORDECAI"></div>
+        <div class="hero-name">MORDECAI<span>_EA</span> SCANNER</div>
+        <div class="tagline">PRECISION. DISCIPLINE. ANALYSIS.</div>
+        <button class="run-state stopped" id="run-state"><span class="run-dot"></span>NOT RUNNING<span class="run-dot"></span></button>
+      </div>
 
-    <div class="icon-btn-block">
-      <div class="icon-btn-row">
-        <button class="icon-circle" data-view="analytics">
-          <span class="icon-circle-glyph">
-            <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="12" width="4" height="9" rx="1" fill="#3ba9ff"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#22e07a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ff2b3d"/></svg>
-          </span><span class="icon-circle-label">ANALYTICS</span>
-        </button>
-        <button class="icon-circle icon-circle-main" id="btn-toggle-run">
-          <span class="icon-circle-glyph" id="toggle-glyph"><svg id="toggle-svg" viewBox="0 0 24 24" width="26" height="26"><polygon points="7,4 20,12 7,20" fill="#fff"/></svg></span><span class="icon-circle-label" id="toggle-label">START</span>
-        </button>
-        <button class="icon-circle" id="btn-reset">
-          <span class="icon-circle-glyph">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" fill="none" stroke="#ff2b3d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span><span class="icon-circle-label">RESET</span>
-        </button>
+      <div class="hero-bottom">
+        <div class="icon-btn-block">
+          <div class="icon-btn-row">
+            <button class="icon-circle" data-view="live">
+              <span class="icon-circle-glyph">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 17l5-6 4 4 8-9" stroke="#ff2b3d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6h5v5" stroke="#ff2b3d" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span><span class="icon-circle-label">QUOTES</span>
+            </button>
+            <button class="icon-circle icon-circle-main" id="btn-toggle-run">
+              <span class="icon-circle-glyph" id="toggle-glyph"><svg id="toggle-svg" viewBox="0 0 24 24" width="26" height="26"><polygon points="7,4 20,12 7,20" fill="#fff"/></svg></span><span class="icon-circle-label" id="toggle-label">START</span>
+            </button>
+            <button class="icon-circle" id="btn-reset">
+              <span class="icon-circle-glyph">
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" fill="none" stroke="#ff2b3d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span><span class="icon-circle-label">REMOVE</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="powered-badge-wrap"><span class="powered-badge">Powered by <b>MORDECAI AI ENGINE</b></span></div>
       </div>
     </div>
 
-    <div class="powered-badge-wrap"><span class="powered-badge">Powered by <b>MORDECAI AI ENGINE</b></span></div>
-
-    <div class="list-rows">
+    <div class="list-rows" style="margin-top:14px;">
       <button class="list-row" data-view="mt5">
         <img class="lr-thumb" id="list-avatar" alt="">
         <div class="lr-mid"><div class="lr-title">MORDECAI_EA SCANNER</div><div class="lr-sub run-color" id="lr-status">RUNNING</div></div>
@@ -102,7 +107,7 @@
       </button>
       <button class="list-row" data-view="analytics">
         <div class="lr-icon"><svg viewBox="0 0 24 24" width="20" height="20"><rect x="3" y="12" width="4" height="9" rx="1" fill="#3ba9ff"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#22e07a"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#ff2b3d"/></svg></div>
-        <div class="lr-mid"><div class="lr-title">SMART MONEY SCANNER</div><div class="lr-sub">AI-powered market analysis</div></div>
+        <div class="lr-mid"><div class="lr-title">CHART SCANNER</div><div class="lr-sub">AI-powered market analysis</div></div>
         <span class="lr-bubble">💬</span>
       </button>
     </div>
@@ -120,6 +125,7 @@
       <div id="engine-list"></div>
     </div>
   </section>
+
 
   <!-- ================= MT5 CONNECTION VIEW ================= -->
   <section id="view-mt5" class="view">
@@ -363,26 +369,21 @@
     </div>
 
     <div class="drawer-list">
-      <button class="drawer-item" data-view="dashboard"><span class="di-icon" style="background:rgba(255,43,61,0.15);">🏠</span><span class="di-label">Dashboard</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="analytics"><span class="di-icon" style="background:rgba(59,169,255,0.15);">📊</span><span class="di-label">Analytics</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="analytics"><span class="di-icon" style="background:rgba(162,59,255,0.15);">🧠</span><span class="di-label">Smart Money Scanner</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="live"><span class="di-icon" style="background:rgba(34,224,122,0.15);">📡</span><span class="di-label">Live Trading</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="performance"><span class="di-icon" style="background:rgba(255,43,61,0.15);">📈</span><span class="di-label">Performance</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="performance"><span class="di-icon" style="background:rgba(255,138,43,0.15);">🕒</span><span class="di-label">Trade History</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="signals"><span class="di-icon" style="background:rgba(255,138,43,0.15);">📜</span><span class="di-label">Signal History</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="mt5"><span class="di-icon" style="background:rgba(59,169,255,0.15);">🔌</span><span class="di-label">MT5 Connection</span><span class="di-chev">›</span></button>
-      <button class="drawer-item" data-view="settings"><span class="di-icon" style="background:rgba(255,255,255,0.1);">⚙️</span><span class="di-label">Settings</span><span class="di-chev">›</span></button>
+      <button class="drawer-item drawer-item-active" data-view="dashboard"><span class="di-icon" style="background:rgba(255,43,61,0.18);">🏠</span><span class="di-label">Home</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="analytics"><span class="di-icon" style="background:rgba(162,59,255,0.18);">📊</span><span class="di-label">Chart Scanner</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="mt5"><span class="di-icon" style="background:rgba(162,59,255,0.18);">🔌</span><span class="di-label">MetaTrader</span><span class="di-chev">›</span></button>
+      <button class="drawer-item" data-view="settings"><span class="di-icon" style="background:rgba(162,59,255,0.18);">⚙️</span><span class="di-label">Settings</span><span class="di-chev">›</span></button>
     </div>
 
     <div class="drawer-section-label">APPEARANCE</div>
     <div class="drawer-list">
       <div class="drawer-item drawer-item-static">
-        <span class="di-icon" style="background:rgba(255,255,255,0.1);">🖼️</span>
-        <span class="di-label">Hide Hero Image</span>
+        <span class="di-icon" style="background:rgba(59,169,255,0.15);">🙈</span>
+        <div class="di-mid"><div class="di-label">Hide Hero Image</div><div class="di-sub">Shows robot backdrop only</div></div>
         <label class="switch"><input type="checkbox" id="toggle-hero-bg-drawer"><span class="switch-track"></span></label>
       </div>
       <div class="drawer-item drawer-item-static" style="flex-direction:column; align-items:flex-start; gap:10px;">
-        <div style="display:flex;align-items:center;gap:12px;"><span class="di-icon" style="background:rgba(255,255,255,0.1);">🎨</span><span class="di-label">Glow Color</span></div>
+        <div style="display:flex;align-items:center;gap:12px;"><span class="di-icon" style="background:rgba(162,59,255,0.15);">💧</span><span class="di-label">Glow Color</span></div>
         <div class="theme-swatches" style="padding-left:52px;">
           <button class="swatch" data-theme="red" style="background:#ff2b3d;"></button>
           <button class="swatch" data-theme="blue" style="background:#2b7dff;"></button>
@@ -390,6 +391,15 @@
           <button class="swatch" data-theme="green" style="background:#22e07a;"></button>
           <button class="swatch" data-theme="cyan" style="background:#22d3ee;"></button>
           <button class="swatch" data-theme="orange" style="background:#ff8a2b;"></button>
+          <button class="swatch" data-theme="pink" style="background:#ff2b8f;"></button>
+          <button class="swatch" data-theme="grape" style="background:#7c3aed;"></button>
+          <button class="swatch" data-theme="magenta" style="background:#e91e8c;"></button>
+          <button class="swatch" data-theme="sky" style="background:#0ea5e9;"></button>
+          <button class="swatch" data-theme="teal" style="background:#14b8a6;"></button>
+          <button class="swatch" data-theme="lime" style="background:#84cc16;"></button>
+          <button class="swatch" data-theme="yellow" style="background:#eab308;"></button>
+          <button class="swatch" data-theme="indigo" style="background:#6d28d9;"></button>
+          <button class="swatch" data-theme="silver" style="background:#e5e7eb;"></button>
         </div>
       </div>
     </div>
@@ -397,13 +407,14 @@
     <div class="drawer-section-label">PERMISSIONS</div>
     <div class="drawer-list">
       <div class="drawer-item drawer-item-static">
-        <span class="di-icon" style="background:rgba(255,255,255,0.1);">🪟</span>
+        <span class="di-icon" style="background:rgba(59,169,255,0.15);">🪟</span>
         <span class="di-label">Draw Over Other Apps</span>
-        <label class="switch"><input type="checkbox" id="toggle-draw-over" disabled><span class="switch-track"></span></label>
+        <label class="switch"><input type="checkbox" id="toggle-draw-over"><span class="switch-track"></span></label>
       </div>
     </div>
 
     <button class="drawer-item" id="drawer-logout" style="margin-top:14px;"><span class="di-icon" style="background:rgba(239,68,68,0.15);">🚪</span><span class="di-label">Logout</span></button>
+    <div class="drawer-version"><span class="drawer-version-dot"></span>V1.0</div>
   </div>
 
   <!-- ================= STATUS PANEL (in-app only, never draws over other apps) ================= -->

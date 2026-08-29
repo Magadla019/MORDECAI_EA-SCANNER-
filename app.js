@@ -28,7 +28,7 @@ function wireLogos() {
   ['login-avatar', 'hero-avatar', 'scan-avatar', 'drawer-avatar', 'status-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = src; });
   ['header-avatar', 'list-avatar'].forEach(id => { const el = document.getElementById(id); if (el) el.src = avatarSrc; });
   const bg = document.getElementById('bg-layer');
-  if (bg) bg.style.backgroundImage = `url(${src})`;
+  if (bg) bg.style.backgroundImage = `url(${window.MORDECAI_LOGO_FULLBODY || src})`;
 }
 wireLogos();
 
@@ -194,7 +194,7 @@ function setRunning(running) {
 
   const runState = document.getElementById('run-state');
   runState.className = 'run-state ' + (running ? 'running' : 'stopped');
-  runState.innerHTML = `<span class="run-dot"></span>${running ? 'RUNNING ●' : 'NOT RUNNING'}`;
+  runState.innerHTML = `<span class="run-dot"></span>${running ? 'RUNNING' : 'NOT RUNNING'}<span class="run-dot"></span>`;
 
   const mainBtn = document.getElementById('btn-toggle-run');
   mainBtn.classList.toggle('is-running', running);
@@ -240,9 +240,13 @@ async function refreshMt5Status() {
     document.getElementById('stat-cloud').textContent = 'CONNECTED';
     document.getElementById('stat-lastsync').textContent = fmtTime(s.lastSync);
     if (s.openPositions?.[0]) document.getElementById('stat-symbol').textContent = s.openPositions[0].symbol;
+    const pillDot = document.getElementById('mt5-pill-dot');
+    if (pillDot) pillDot.className = 'mt5-pill-dot ' + (s.connected ? 'ok' : 'bad');
     return s;
   } catch (e) {
     document.getElementById('stat-cloud').textContent = 'CLOUD OFFLINE';
+    const pillDot = document.getElementById('mt5-pill-dot');
+    if (pillDot) pillDot.className = 'mt5-pill-dot bad';
     return null;
   }
 }
@@ -723,6 +727,16 @@ patternToggle?.addEventListener('change', () => {
   if (patternToggle) patternToggle.checked = savedPatternPref;
   applyPatternLockUI(savedPatternPref);
 }
+
+// "Draw Over Other Apps" - same as Pattern Lock, this saves a preference but
+// a website/PWA has no way to actually request that Android permission or
+// draw outside its own tab. Kept as a plain toggle (not disabled) per the
+// drawer design, but it doesn't do anything beyond remembering the choice.
+const drawOverToggle = document.getElementById('toggle-draw-over');
+drawOverToggle?.addEventListener('change', () => {
+  localStorage.setItem('mordecai_draw_over_pref', String(drawOverToggle.checked));
+});
+if (drawOverToggle) drawOverToggle.checked = localStorage.getItem('mordecai_draw_over_pref') === 'true';
 
 // ---------------- boot ----------------
 // Sign-in is optional, not a gate: the dashboard is usable either way, and
