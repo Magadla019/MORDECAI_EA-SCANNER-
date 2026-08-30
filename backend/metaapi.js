@@ -20,12 +20,22 @@
 let MetaApiSDK = null;
 async function loadSdk() {
   if (MetaApiSDK) return MetaApiSDK;
+
   try {
     const mod = await import('metaapi.cloud-sdk');
     MetaApiSDK = mod.default || mod;
+
+    if (!MetaApiSDK) {
+      throw new Error('MetaApi SDK loaded but returned no module.');
+    }
+
     return MetaApiSDK;
   } catch (err) {
-    throw new Error('metaapi.cloud-sdk is not installed. Run: npm install metaapi.cloud-sdk (in backend/)');
+    console.error('METAAPI SDK LOAD ERROR:', err);
+
+    throw new Error(
+      `MetaApi SDK failed to load: ${err?.message || String(err)}`
+    );
   }
 }
 
