@@ -63,12 +63,9 @@ Two ways, pick per client:
 
 ### Option A — Login (no laptop/VPS needed, recommended for most clients)
 
-1. Get the client's **Investor Password** (read-only) — in their MT5 app:
-   Account → tap it → Manage Accounts → Change Password → generate/view the
-   **Investor** password (not the main trading password). This password can
-   view balance/positions/history but can never place a trade, even by mistake.
-2. In the app: **☰ menu → MT5 Connection → LOGIN tab**, enter the account
-   number, investor password, and server name (e.g. `AccuMarkets-Live`), tap
+1. Have the client's MT5 **login, password, server and broker name** ready (works for live and demo accounts).
+2. In the app: **☰ menu → MT5 Connection → LOGIN tab**, enter the broker,
+   account number, password, and server name (e.g. `AccuMarkets-Live`), tap
    **LINK MT5 ACCOUNT DETAILS**.
 3. Under the hood this uses [MetaApi.cloud](https://metaapi.cloud) to run the
    actual MT5 session in their infrastructure — nothing needs to run on the

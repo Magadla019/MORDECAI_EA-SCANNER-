@@ -352,14 +352,14 @@ document.querySelectorAll('[data-mt5tab]').forEach(btn => {
 document.getElementById('btn-link-mt5').addEventListener('click', async () => {
   const broker = document.getElementById('link-broker').value.trim();
   const login = document.getElementById('link-login').value.trim();
-  const investorPassword = document.getElementById('link-password').value;
+  const password = document.getElementById('link-password').value;
   const server = document.getElementById('link-server').value.trim();
   const accountType = document.getElementById('link-account-type').value;
   const errEl = document.getElementById('link-error');
   errEl.textContent = '';
 
-  if (!login || !investorPassword || !server) {
-    errEl.textContent = 'Login, investor password, and server are all required.';
+  if (!login || !password || !server) {
+    errEl.textContent = 'Login, password, and server are all required.';
     return;
   }
 
@@ -367,7 +367,7 @@ document.getElementById('btn-link-mt5').addEventListener('click', async () => {
   const btn = document.getElementById('btn-link-mt5');
   btn.textContent = 'LINKING…';
   try {
-    await api('/api/mt5/link', { method: 'POST', body: JSON.stringify({ login, investorPassword, server, label, broker, accountType }) });
+    await api('/api/mt5/link', { method: 'POST', body: JSON.stringify({ login, password, server, label, broker, accountType }) });
     document.getElementById('link-password').value = '';
     await refreshMt5View();
   } catch (e) {

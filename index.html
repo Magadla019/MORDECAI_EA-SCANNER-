@@ -154,12 +154,12 @@
 
         <div class="field"><label>Broker</label><input id="link-broker" type="text" placeholder="e.g. RazorMarkets, AccuMarkets"></div>
         <div class="field"><label>Login (Account Number)</label><input id="link-login" type="number" inputmode="numeric" placeholder="e.g. 3204917"></div>
-        <div class="field"><label>Investor Password (read-only)</label><input id="link-password" type="password" placeholder="Not your trading password"></div>
+        <div class="field"><label>Password</label><input id="link-password" type="password" placeholder="Your MT5 trading password"></div>
         <div class="field"><label>Server</label><input id="link-server" type="text" placeholder="e.g. AccuMarkets-Live, RazorMarkets-Demo"></div>
         <div class="field"><label>Account Type</label>
           <select id="link-account-type"><option value="live">Live</option><option value="demo">Demo</option></select>
         </div>
-        <p class="footer-note" style="text-align:left;margin:0 0 12px;color:var(--yellow);">Use the <b>Investor Password</b> from your MT5 app (Account → right-click → Manage Accounts → Change Password → Investor). It can only view your account — it can never place a trade, even by mistake.</p>
+        <p class="footer-note" style="text-align:left;margin:0 0 12px;color:var(--yellow);">Enter the same <b>login, password and server</b> you use to sign in to MT5 (live or demo). Your password is encrypted before it is stored.</p>
 
         <button id="btn-link-mt5" class="btn btn-start btn-block">LINK MT5 ACCOUNT DETAILS</button>
         <p id="link-error" class="footer-note" style="color:#ef4444;"></p>
