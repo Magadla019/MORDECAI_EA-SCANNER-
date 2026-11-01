@@ -1,0 +1,21 @@
+{
+  "name": "MORDECAI",
+  "short_name": "MORDECAI",
+  "start_url": "https://magadla019.github.io/MORDECAI_EA-SCANNER-/",
+  "display": "standalone",
+  "background_color": "#05070a",
+  "theme_color": "#05070a",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "description": "Best trading bot"
+}
